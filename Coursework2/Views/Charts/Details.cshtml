@@ -1,0 +1,91 @@
+﻿@model CryptoCurrencyMetaData
+<p id="id">@Model.Data.First().Value.Slug</p>
+<select id="history" class="form-control">
+    <option value="" disabled selected>Select Currency History Interval</option>
+    <option value="m1">1 minute</option>
+    <option value="m15">15 minute</option>
+    <option value="m30">30 minute</option>
+    <option value="h1">1 hour</option>
+    <option value="h6">6 hour</option>
+    <option value="h12">12 hour</option>
+    <option value="d1">1 day</option>
+</select>
+<canvas id="myChart" style="max-height: fit-content; max-width: fit-content;"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.1.0/chartjs-plugin-zoom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.0.1/chartjs-plugin-annotation.js"></script>
+
+
+<script type="text/javascript">
+    var currencyid = document.getElementById("id").innerText;
+    var myChart;
+
+    document.getElementById("history").addEventListener("change", function () {
+        var SelectedHistory = this.value;
+        AjaxRequest(currencyid, SelectedHistory);
+       
+    });
+    $(document).ready(function () {
+        AjaxRequest(currencyid);
+    });
+    function AjaxRequest(currencyid, SelectedHistory = "d1") {
+        $.ajax({
+            type: "POST",
+            url: "/Charts/GetDataHistory?CurrencyName=" + currencyid + "&Interval=" + SelectedHistory,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                loadChartData(data)
+            },
+            error: function () {
+                alert("Помилка при завантаженні даних.");
+            }
+        });
+    }
+
+    function loadChartData(data) {
+        var _data = data;
+        var _chartLabels = _data[0];
+        var _chartData = _data[1];
+        var color = ["#B738FF", "#CF9BE7", "#673A7C", "#B92CCF", "#590566"];
+        // Обчислюємо середнє значення
+        var averageValue = _chartData.reduce((a, b) => a + b, 0) / _chartData.length;
+
+        // Отримуємо колір для значення на основі порівняння з середнім
+        var color = _chartData.map(function (value) {
+            return value > averageValue ? 'green' : 'red';
+        });
+        var existingChart = myChart;
+
+        if (existingChart) {
+            existingChart.destroy();
+        }
+        
+        myChart = new Chart("myChart", {
+            type: "line",
+            data: {
+                labels: _chartLabels,
+                datasets: [{
+                    label: "Prices",
+                    data: _chartData,
+                    pointBackgroundColor: color,
+                    pointRadius: 1, // Відображення точок за замовчуванням вимкнено
+                    pointHoverRadius: 5, // Розмір точок при наведенні
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        display: false,  // Вимкнути відображення осі X
+                    },
+                    y: {
+                    
+                    },
+                },
+            },
+            
+        });  
+    }
+</script>

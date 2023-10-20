@@ -1,0 +1,315 @@
+﻿@model CryptoCurrenciesListMetaData
+@using Coursework2.Interfaces;
+@using System.Globalization;
+@inject ICoinMarketCapFunctional _service;
+@{
+    var fiats = await _service.GetCoinMarketCapFiatAsync();
+    CultureInfo cultureInfo = new CultureInfo("en-US");
+}
+<div class="container align-content-center justify-content-center">
+    <button id="openModalButton">Select Currency</button>
+
+    <!-- Модальне вікно -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <div class="image-list">
+                <p class="group-label">FIAT CURRENCY</p>
+                <hr class="group-divider" />
+                <div class="fiat-currencies d-flex">
+                    <div class="currency-item">
+                        <img src="/Image/USD.png" data-value="USD" data-sign="$" class="currency-image" />
+                        <div class="d-block">
+                            <p class="currency-name">United States Dollar</p>
+                            <p class="currency-sign">USD - $</p>
+                        </div>
+                    </div>
+                    <div class="currency-item">
+                        <img src="/Image/EUR.png" data-value="EUR" data-sign="€" class="currency-image" />
+                        <div class="d-block">
+                            <p class="currency-name">Euro</p>
+                            <p class="currency-sign">EUR - €</p>
+                        </div>
+                    </div>
+                    <div class="currency-item">
+                        <img src="/Image/UAN.png" data-value="UAH" data-sign="₴" class="currency-image" />
+                        <div class="d-block">
+                            <p class="currency-name">Ukrainian Hryvnia</p>
+                            <p class="currency-sign">UAH - ₴</p>
+                        </div>
+                    </div>
+                    <div class="currency-item">
+                        <img src="/Image/BRL.png" data-value="BRL" data-sign="R$" class="currency-image" />
+                        <div class="d-block">
+                            <p class="currency-name">Brazilian Real</p>
+                            <p class="currency-sign">BRL - R$</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="group-label">CRYPTO CURRENCY</p>
+                <hr class="group-divider" />
+                <div class="crypto-currencies d-flex">
+                    <div class="currency-item">
+                        <img src="/Image/BTC.png" data-value="BTC" data-sign="BTC" class="currency-image" />
+                        <div class="d-block">
+                        <p class="currency-name">Bitcoin</p>
+                            <p class="currency-sign">BTC</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="cryptoTable" class="table custom-table">
+            <!-- Заголовок таблиці -->
+            <thead>
+                <tr>
+                    <th class="fixed-clumn">Rank</th>
+                    <th class="fixed-column">Name</th>
+                    <th>Symbol</th>
+                    <th>Market Cap</th>
+                    <th>Price</th>
+                    <th>Circulating Supply</th>
+                    <th>Volume(24h)</th>
+                    <th>% 1h</th>
+                    <th>% 24h</th>
+                    <th>% 7d</th>
+                </tr>
+            </thead>
+            <!-- Тіло таблиці -->
+            <tbody>
+                @foreach (var crypto in Model.data)
+                {
+                    <tr data-id="@crypto.id" class="table-row">
+                        <td class="fixed-column">@crypto.cmc_rank</td>
+                        <td class="fixed-column"><img style="max-height:20px;max-width:20px;" src="@crypto.urlLogo" /> <a asp-action="Details" asp-controller="Charts" asp-route-CurrencyID="@crypto.id">@crypto.name</a></td>
+                        <td>@crypto.symbol</td>
+                        <td>@string.Format(cultureInfo, "{0:C0}", @crypto.quote.First().Value.market_cap)</td>
+                        <td>@string.Format("${0:#,0.00}", crypto.quote.First().Value.price)</td>
+                        <td>@Math.Round(crypto.circulating_supply)</td>
+                        <td>@string.Format("${0:#,0}", crypto.quote.First().Value.volume_24h)</td>
+                        <td class="@((crypto.quote.First().Value.percent_change_1h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_1h < 0) ? "negative" : "neutral")">
+                            @crypto.quote.First().Value.percent_change_1h.ToString("N2")%
+                        </td>
+                        <td class="@((crypto.quote.First().Value.percent_change_24h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
+                            @crypto.quote.First().Value.percent_change_24h.ToString("N2")%
+                        </td>
+                        <td class="@((crypto.quote.First().Value.percent_change_7d > 0) ? "positive" : (crypto.quote.First().Value.percent_change_7d < 0) ? "negative" : "neutral")">
+                            @crypto.quote.First().Value.percent_change_7d.ToString("N2")%
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    
+    // Отримуємо необхідні елементи DOM
+    var modal = document.getElementById("myModal");
+    var closeModalButton = document.getElementById("closeModal");
+    var currencyImages = document.querySelectorAll(".currency-image");
+
+    // Відкриття модального вікна
+    openModalButton.onclick = function () {
+        modal.style.display = "block";
+    };
+
+    // Закриття модального вікна
+    closeModalButton.onclick = function () {
+        modal.style.display = "none";
+    };
+
+    currencyImages.forEach(function (image) {
+        image.onclick = function () {
+            var selectedValue = this.getAttribute("data-value");
+            var selectedSign = this.getAttribute("data-sign");
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                url: "/Charts/GetSelectedFiats?FiatName=" + selectedValue,
+                success: function (data) {
+                    updateTable(data, selectedSign);
+                },
+                error: function () {
+                    alert("Помилка при завантаженні даних.");
+                }
+            });
+            modal.style.display = "none";
+        };
+    });
+
+
+    function updateTable(data, selectedFiatSign) {
+        // Очищаємо поточну таблицю
+        $("#cryptoTable tbody").empty();
+
+        // Перебираємо нові дані і заповнюємо таблицю
+        $.each(data.data, function (index, crypto) {
+            var quote = Object.values(crypto.quote)[0];
+            var row = '<tr data-id="' + crypto.id + '">'
+                + '<td class="fixed-column">' + crypto.cmc_rank + '</td>'
+                + '<td class="fixed-column"><img style="max-height:20px;max-width:20px;" src="' + crypto.urlLogo + '"/> ' + crypto.name + '</td>'
+                + '<td>' + crypto.symbol + '</td>'
+                + '<td>' + formatCurrency(quote.market_cap, selectedFiatSign) + '</td>'
+                + '<td>' + formatCurrency(quote.price, selectedFiatSign, 2) + '</td>'
+                + '<td>' + formatNumber(crypto.circulating_supply) + '</td>'
+                + '<td>' + formatCurrency(quote.volume_24h, selectedFiatSign) + '</td>'
+                + '<td class="' + getChangeClass(quote.percent_change_1h) + '">' + quote.percent_change_1h.toFixed(2) + '%</td>'
+                + '<td class="' + getChangeClass(quote.percent_change_24h) + '">' + quote.percent_change_24h.toFixed(2) + '%</td>'
+                + '<td class="' + getChangeClass(quote.percent_change_7d) + '">' + quote.percent_change_7d.toFixed(2) + '%</td>'
+                + '</tr>';
+            $("#cryptoTable tbody").append(row);
+        });
+    }
+
+    // Допоміжні функції для форматування та визначення класу для зміни
+    function formatCurrency(value, symbol, decimals = 0) {
+        return value.toFixed(decimals).replace(/\d(?=(\d{3})+\.)/g, '$&,') + symbol;
+    }
+
+    function formatNumber(value) {
+        return value.toFixed(0).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+
+    function getChangeClass(value) {
+        if (value > 0) return 'positive';
+        if (value < 0) return 'negative';
+        return 'neutral';
+    }
+</script>
+<style>
+    /* Стилі для модального вікна */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 10px;
+        border: 1px solid #888;
+        width: 60%;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .close {
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover {
+        color: red;
+    }
+
+    .currency-image {
+        cursor: pointer; /* Змінює вид курсору на руку при наведенні */
+        transition: transform 0.2s; /* Додає плавний ефект при наведенні */
+    }
+
+   .currency-image:hover {
+       transform: scale(1.1); /* Збільшує зображення при наведенні */
+   }
+
+   .currency-image:active {
+       transform: scale(0.9); /* Зменшує зображення при натисканні */
+   }
+
+    .currency-item {
+        display:flex;
+        width: 200px;
+        align-items: center; /* Вирівнювання по вертикалі */
+        text-align: center;
+        margin: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .currency-image {
+        max-width: 30px;
+        max-height: 30px;
+        margin-right: 5px;
+    }
+
+    .currency-name {
+        font-size:14px;
+        margin: 0;
+    }
+
+    .currency-sign {
+        font-size: 12px;
+        font-style: italic;
+        color:grey;
+        margin: 0; 
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        font-weight: bold;
+    }
+
+
+    /* Стилі для фіксованих стовпців */
+    .fixed-column {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+    }
+    /* Стиль для виділення рядка таблиці при наведенні */
+    .table-row:hover {
+        background-color: #f0f0f0; /* Змініть колір, який вам подобається */
+        cursor: pointer; /* Змініть курсор за потреби */
+    }
+
+        .fixed-column:nth-child(2) {
+            left: 7%; /* Встановіть відстань між фіксованими стовпцями */
+        }
+
+    /* Стилі для нормальних стовпців (задайте відповідний z-index) */
+    .custom-table th, .custom-table td {
+        padding: 8px;
+        text-align: left;
+        white-space: nowrap;
+        z-index: 0; /* Встановіть зовнішню висоту для нормальних стовпців */
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    #cryptoTable tr td:nth-child(7) {
+        color: blue;
+    }
+
+    .positive {
+        color: green; /* Колір для додатніх значень */
+    }
+
+    .negative {
+        color: red; /* Колір для від'ємних значень */
+    }
+
+    .neutral {
+        color: blue; /* Колір для нейтральних значень */
+    }
+
+</style>
