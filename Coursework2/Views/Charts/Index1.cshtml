@@ -1,0 +1,120 @@
+﻿@model CryptoCurrenciesListMetaData
+@using System.Globalization
+@{
+    CultureInfo cultureInfo = new CultureInfo("en-US");
+}
+<div class="container align-content-center justify-content-center">
+    <div class="table-responsive">
+        <table id="cryptoTable" class="table custom-table">
+            <!-- Заголовок таблиці -->
+            <thead>
+                <tr>
+                    <th class="fixed-clumn">Rank</th>
+                    <th class="fixed-column">Name</th>
+                    <th>Symbol</th>
+                    <th>Market Cap</th>
+                    <th>Price</th>
+                    <th>Circulating Supply</th>
+                    <th>Volume(24h)</th>
+                    <th>% 1h</th>
+                    <th>% 24h</th>
+                    <th>% 7d</th>
+                </tr>
+            </thead>
+            <!-- Тіло таблиці -->
+            <tbody>
+                @foreach (var crypto in Model.data)
+                {
+                    <tr data-id="@crypto.id">
+                        <td class="fixed-column">@crypto.cmc_rank</td>
+                        <td class="fixed-column"><img style="max-height:20px;max-width:20px;" src="@crypto.urlLogo" /> @crypto.name</td>
+                        <td>@crypto.symbol</td>
+                        <td>@string.Format(cultureInfo, "{0:C0}", @crypto.quote["USD"].market_cap)</td>
+                        <td>@string.Format("${0:#,0.00}", crypto.quote["USD"].price)</td>
+                        <td>@Math.Round(crypto.circulating_supply)</td>
+                        <td>@string.Format("${0:#,0}", crypto.quote["USD"].volume_24h)</td>
+                        <td class="@((crypto.quote["USD"].percent_change_1h > 0) ? "positive" : (crypto.quote["USD"].percent_change_1h < 0) ? "negative" : "neutral")">
+                            @crypto.quote["USD"].percent_change_1h.ToString("N2")%
+                        </td>
+                        <td class="@((crypto.quote["USD"].percent_change_24h > 0) ? "positive" : (crypto.quote["USD"].percent_change_24h < 0) ? "negative" : "neutral")">
+                            @crypto.quote["USD"].percent_change_24h.ToString("N2")%
+                        </td>
+                        <td class="@((crypto.quote["USD"].percent_change_7d > 0) ? "positive" : (crypto.quote["USD"].percent_change_7d < 0) ? "negative" : "neutral")">
+                            @crypto.quote["USD"].percent_change_7d.ToString("N2")%
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        font-weight: bold;
+    }
+
+
+    /* Стилі для фіксованих стовпців */
+    .fixed-column {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+    }
+
+        .fixed-column:nth-child(2) {
+            left: 7%; /* Встановіть відстань між фіксованими стовпцями */
+        }
+
+    /* Стилі для нормальних стовпців (задайте відповідний z-index) */
+    .custom-table th, .custom-table td {
+        padding: 8px;
+        text-align: left;
+        white-space: nowrap;
+        z-index: 0; /* Встановіть зовнішню висоту для нормальних стовпців */
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    #cryptoTable tr td:nth-child(7) {
+        color: blue;
+    }
+
+    .positive {
+        color: green; /* Колір для додатніх значень */
+    }
+
+    .negative {
+        color: red; /* Колір для від'ємних значень */
+    }
+
+    .neutral {
+        color: blue; /* Колір для нейтральних значень */
+    }
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        // Ваш код для обробки натискання кнопки "Show Graph" (завантаження графіка)
+        $.ajax({
+            type: "POST",
+            url: "/Charts/GetCurrency",
+            dataType: "json",
+            success: function (response) {
+               
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    })
+</script>

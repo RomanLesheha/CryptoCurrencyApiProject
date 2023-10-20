@@ -1,0 +1,111 @@
+﻿@using Coursework2.Interfaces;
+@inject ICoinMarketCapFunctional _service;
+@{
+    var fiats = await _service.GetCoinMarketCapFiatAsync();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Coursework2</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Coursework2.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Coursework2</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Charts" asp-action="Index1">Currencies</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Charts" asp-action="Index2">Exchanges</a>
+                        </li>
+                        
+                    </ul>
+                   
+                </div>
+                <div class="dropdown">
+                    <select id="fiatDropdown" class="form-control">
+                        <option value="">Select Fiat Currency</option>
+                        @if (fiats != null && fiats.Data != null)
+                        {
+                            @foreach (var item in fiats.Data)
+                            {
+                                <option value="@item.Id">@item.Symbol</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <script src="~/lib/jquery/dist/jquery.min.js"></script>
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2023 - Coursework2 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script>
+        document.getElementById("fiatDropdown").addEventListener("change", function () {
+            var selectedFiatId = this.value;
+            // Виконати AJAX-запит на сервер для отримання даних за вибраною валютою
+            $.ajax({
+                type: "GET",
+                url: "/Charts/GetSelectedFiats?fiatId=" + selectedFiatId,
+                success: function (data) {
+                    // Оновіть таблицю даними, які отримані з сервера
+                    var tableBody = document.querySelector("#cryptoTable tbody");
+                    tableBody.innerHTML = data;
+                },
+                error: function () {
+                    alert("Помилка при завантаженні даних.");
+                }
+            });
+        });
+    </script>
+  @*   <script>
+        $(document).ready(function () {
+            populateFiatDropdown();
+        });
+
+        function populateFiatDropdown() {
+            $.ajax({
+                url: '/Charts/GetFiats',
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    var dropdown = $('#fiatDropdown');
+                    dropdown.find('option').remove(); // Очищення списку
+
+                    $.each(data.Data, function (index, item) {
+                        dropdown.append($('<option>', { value: item.Id, text: item.Symbol }));
+                    });
+                },
+                error: function () {
+                    // Обробка помилки, якщо її відправлення на сервер
+                }
+            });
+        }
+    </script> *@
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

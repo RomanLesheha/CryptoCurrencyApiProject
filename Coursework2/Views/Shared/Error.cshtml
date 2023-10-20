@@ -1,0 +1,19 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="text-center">
+            <img src="https://img.freepik.com/free-vector/internet-network-warning-404-error-page-file-found-web-page-internet-error-page-issue-found-network-404-error-present-by-man-sleep-display_1150-55450.jpg" style="max-width:60%; max-height:60%;" alt="Error" />
+            <h3 class="text-info">An error occurred while processing your request.</h3>
+            <h3 class="text-info">Error Message:</h3>
+            <h4 class="text-danger">@Model.ErrorMessage</h4>
+            <h5 class="text-danger">@Model.ExceptionDetails</h5>
+            <h5 class="text-danger">@Model.StackTrace</h5>
+        </div>
+    }
+</div>
+
+

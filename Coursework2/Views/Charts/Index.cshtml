@@ -1,0 +1,138 @@
+﻿<input id="ID" value="Show Graph" type="button" />
+<input id="nextButton" value="Next 10" type="button" />
+<br />
+
+<canvas id="myChart" style="max-height: fit-content; max-width: fit-content;"></canvas>
+<div id="resultDiv" style="white-space: pre;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.1.0/chartjs-plugin-zoom.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var myChart;
+        var currentIndex = 0;
+        function loadChartData(currentIndex) {
+            $.ajax({
+                type: "POST",
+                url: "/Charts/GetData",
+                data: { Index: currentIndex },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    var _data = data;
+                    var _chartLabels = _data[0];
+                    var _chartData = _data[1];
+                    var _hiddenValues = _data[2];
+
+                    var color = ["#B738FF", "#CF9BE7", "#673A7C", "#B92CCF", "#590566"];
+
+                    var existingChart = myChart;
+
+                    if (existingChart) {
+                        existingChart.destroy();
+                    }
+
+                    myChart = new Chart("myChart", {
+                        type: "bar",
+                        data: {
+                            labels: _chartLabels,
+                            datasets: [{
+                                label: "Prices",
+                                backgroundColor: color,
+                                data: _chartData,
+                                hiddenValues: _hiddenValues
+                            }]
+                        },
+                        // options: {
+                        //     plugins: {
+                        //         zoom: {
+                        //             pan: {
+                        //                 enabled: true,
+                        //                 mode: 'x'
+                        //             },
+                        //             zoom: {
+                        //                 wheel: {
+                        //                     enabled: true,
+                        //                 },
+                        //                 pinch: {
+                        //                     enabled: true
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // },
+                    });
+                    
+                    myChart.canvas.onclick = function (event) {
+                        var activePoints = myChart.getElementsAtEventForMode(event, 'index', { intersect: true });
+
+                        if (activePoints.length > 0) {
+                            var datasetIndex = activePoints[0].datasetIndex;
+                            var index = activePoints[0].index;
+
+                            var value = myChart.data.datasets[datasetIndex].data[index];
+                            var label = myChart.data.labels[index];
+                            var Id = _hiddenValues[index];
+
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/Charts/GetSelectedData",
+                                data: { ID: Id },
+                                dataType: "json",
+                                success: function (response) {
+                                    var resultDiv = document.getElementById("resultDiv");
+                                    resultDiv.innerHTML = "";
+                                    // Отримати значення з об'єкта response (який є SingleAsset)
+                                    var id = response.Id;
+                                    var rank = response.Rank;
+                                    var symbol = response.symbol;
+                                    var name = response.name;
+                                    // Інші властивості об'єкта SingleAsset
+
+                                    // Вивести значення у <p> елементи
+                                    var idParagraph = document.createElement("p");
+                                    idParagraph.textContent = "ID: " + id;
+
+                                    var rankParagraph = document.createElement("p");
+                                    rankParagraph.textContent = "Rank: " + rank;
+
+                                    var symbolParagraph = document.createElement("p");
+                                    symbolParagraph.textContent = "Symbol: " + symbol;
+
+                                    var nameParagraph = document.createElement("p");
+                                    nameParagraph.textContent = "Name: " + name;
+
+                                    // Додати <p> елементи до div
+                                    resultDiv.appendChild(idParagraph);
+                                    resultDiv.appendChild(rankParagraph);
+                                    resultDiv.appendChild(symbolParagraph);
+                                    resultDiv.appendChild(nameParagraph);
+                                },
+                                error: function (err) {
+                                    console.log(err);
+                                }
+                            });
+                        }
+                    };
+                }
+            });
+        }
+
+        $('#ID').click(function () {
+            currentIndex = 0;
+            loadChartData();
+        });
+
+        $(document).ready(function () {
+            loadChartData(currentIndex); // Першість завантаження даних з поточним `currentIndex`
+            $('#nextButton').click(function () {
+                currentIndex++;
+                loadChartData(currentIndex);
+                console.log(currentIndex);
+            });
+        });
+    });
+</script>
+
