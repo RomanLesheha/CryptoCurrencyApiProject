@@ -30,18 +30,6 @@
                     </ul>
                    
                 </div>
-                <div class="dropdown">
-                    <select id="fiatDropdown" class="form-control">
-                        <option value="">Select Fiat Currency</option>
-                        @if (fiats != null && fiats.Data != null)
-                        {
-                            @foreach (var item in fiats.Data)
-                            {
-                                <option value="@item.Id">@item.Symbol</option>
-                            }
-                        }
-                    </select>
-                </div>
             </div>
         </nav>
     </header>

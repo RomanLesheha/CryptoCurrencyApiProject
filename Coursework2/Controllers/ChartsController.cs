@@ -1,6 +1,7 @@
 ﻿using Coursework2.Interfaces;
 using Coursework2.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Linq;
 
@@ -31,7 +32,7 @@ namespace Coursework2.Controllers
         {
             try
             {
-                var result = await _marketCapFunctional.GetCryptoCurrenciesListMetaAsync();
+                var result = await _marketCapFunctional.GetCryptoCurrenciesListMetaAsync(null);
                 return View(result);
             }
             catch (Exception ex)
@@ -71,12 +72,7 @@ namespace Coursework2.Controllers
             return result;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> GetSelectedData(string ID)
-        {
-            var result = await _parseFunctional.ParseSelectedCurrency(ID);
-            return Json(result);
-        }
+       
 
         [HttpPost]
         public async Task<IActionResult> GetFiats()
@@ -86,10 +82,19 @@ namespace Coursework2.Controllers
             return Json(result);
         }
 
+        
         [HttpPost]
-        public async Task<IActionResult> GetSelectedFiats(string FiatName)
+        public async Task<IActionResult> GetFilteredResult(string queryParams)
         {
-            var result = await _marketCapFunctional.GetCryptoCurrenciesListMetaAsync(FiatName);
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(queryParams);
+
+            // Створюємо об'єкт Dictionary<string, object> з отриманих даних
+            Dictionary<string, object> queryParam = new Dictionary<string, object>();
+            foreach (var item in data)
+            {
+                queryParam[item.Key] = item.Value;
+            }
+            var result = await _marketCapFunctional.GetCryptoCurrenciesListMetaAsync(queryParams:queryParam);
             return Json(result);
 
         }
