@@ -84,19 +84,19 @@ namespace Coursework2.Realizations
                 return null;
             }
         }
-        public async Task<CryptoCurrenciesListMetaData> GetCryptoCurrenciesListMetaAsync(string FiatName = "USD")
+        public async Task<CryptoCurrenciesListMetaData> GetCryptoCurrenciesListMetaAsync(Dictionary<string, object> queryParams)
         {
             string apiKey = await _keyFactory.GetNextValidAPIKeyAsync();
             try
             {
-                string endpoint = $"v1/cryptocurrency/listings/latest?convert={FiatName}";
+                string endpoint = $"v1/cryptocurrency/listings/latest";
                 //var queryParams = new Dictionary<string, object>
                 //{
                 //    { "sort_dir", "desc" },
                 //    { "sort", "price" },
                 //};
 
-                var response = await _apiParser.GetApiParser(ApiServiceFactory.ApiParserType.CoinMarketCap).ParseAsync<CryptoCurrenciesListMetaData>(endpoint);
+                var response = await _apiParser.GetApiParser(ApiServiceFactory.ApiParserType.CoinMarketCap).ParseAsync<CryptoCurrenciesListMetaData>(_keyFactory.BuildUrl(endpoint, queryParams));
 
                 var ids = response.data.Select(x => x.id).ToList();
                 var metadata = await GetCoinMarketCapMetaDataAsync(ids);

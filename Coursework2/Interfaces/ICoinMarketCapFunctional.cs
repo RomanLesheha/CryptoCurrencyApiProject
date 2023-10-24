@@ -10,7 +10,7 @@ namespace Coursework2.Interfaces
 
         Task<CryptoCurrencyMetaData> GetCoinMarketCapMetaDataAsync(int CurrencyId);
 
-        Task<CryptoCurrenciesListMetaData> GetCryptoCurrenciesListMetaAsync(string FiatName = "USD");
+        Task<CryptoCurrenciesListMetaData> GetCryptoCurrenciesListMetaAsync(Dictionary<string, object> queryParams);
 
         Task<PriceConversionData> GetPriceConversionDataAsync();
 

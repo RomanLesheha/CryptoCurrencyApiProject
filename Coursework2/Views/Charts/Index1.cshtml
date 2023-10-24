@@ -8,11 +8,11 @@
 }
 <div class="container align-content-center justify-content-center">
     <button id="openModalButton">Select Currency</button>
-
+    <button id="openModal2Button">Filters</button>
     <!-- Модальне вікно -->
     <div id="myModal" class="modal">
         <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
+            <span class="close" data-modal="myModal">&times;</span>
             <div class="image-list">
                 <p class="group-label">FIAT CURRENCY</p>
                 <hr class="group-divider" />
@@ -60,6 +60,37 @@
             </div>
         </div>
     </div>
+
+    <!-- Модальне вікно -->
+    <div id="myModal2" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal="myModal2">&times;</span>
+            <p class="group-label">Cryptocurrency Type</p>
+            <hr class="group-divider" />
+            <form id="cryptoForm" method="post">
+                <input type="radio" id="all" name="cryptocurrency_type" value="all">
+                <label for="all">All cryptocurrencies</label><br>
+                <input type="radio" id="coins" name="cryptocurrency_type" value="coins">
+                <label for="coins">Coins</label><br>
+                <input type="radio" id="tokens" name="cryptocurrency_type" value="tokens">
+                <label for="tokens">Tokens</label>
+            </form>
+            <p class="group-label">Market Cap</p>
+            <hr class="group-divider" />
+            <div>
+                <p>Market Cap Range</p>
+                <input type="number" name="marketCapRange" id="minMarketCap" placeholder="Min" />
+                <p>to</p>
+                <input type="number" name="marketCapRange" id="maxMarketCap" placeholder="Max" />
+                <button id="applyFilter" >Apply Filter</button>
+            </div>
+            <div>
+                
+            </div>
+        </div>
+    </div>
+
+
     <div class="table-responsive">
         <table id="cryptoTable" class="table custom-table">
             <!-- Заголовок таблиці -->
@@ -78,7 +109,7 @@
                 </tr>
             </thead>
             <!-- Тіло таблиці -->
-            <tbody>
+            <tbody id="cryptoTableBody">
                 @foreach (var crypto in Model.data)
                 {
                     <tr data-id="@crypto.id" class="table-row">
@@ -109,40 +140,113 @@
     
     // Отримуємо необхідні елементи DOM
     var modal = document.getElementById("myModal");
-    var closeModalButton = document.getElementById("closeModal");
+    var modal2 = document.getElementById("myModal2");
+    var closeModalButtons = document.getElementsByClassName("close");
     var currencyImages = document.querySelectorAll(".currency-image");
 
-    // Відкриття модального вікна
+    var minMarketCapInput = document.getElementById("minMarketCap");
+    var maxMarketCapInput = document.getElementById("maxMarketCap");
+    var applyFilterButton = document.getElementById("applyFilter");
+
+
+    for (var i = 0; i < closeModalButtons.length; i++) {
+        closeModalButtons[i].addEventListener("click", function () {
+            var modalId = this.getAttribute("data-modal");
+            var modal = document.getElementById(modalId);
+            modal.style.display = "none";
+        });
+    }
+    // Відкриття модального вікна для вибору ціни
     openModalButton.onclick = function () {
         modal.style.display = "block";
     };
 
-    // Закриття модального вікна
-    closeModalButton.onclick = function () {
-        modal.style.display = "none";
+    // Відкриття модального вікна для фільтрів
+    openModal2Button.onclick = function () {
+        modal2.style.display = "block";
     };
 
+    // Об'єкт для зберігання параметрів
+    var queryParams = {};
+
+    var radioButtons = document.querySelectorAll('input[name="cryptocurrency_type"]');
+    for (var i = 0; i < radioButtons.length; i++) {
+        radioButtons[i].addEventListener("change", function () {
+            var selectedCryptoType = document.querySelector('input[name="cryptocurrency_type"]:checked');
+            if (selectedCryptoType) {
+                // Додавання параметру до об'єкта queryParams
+                if (queryParams.hasOwnProperty("cryptocurrency_type")) {
+                    queryParams["cryptocurrency_type"] = selectedCryptoType.value;
+                } else {
+                    // Якщо параметр не існує, додайте його
+                    queryParams["cryptocurrency_type"] = selectedCryptoType.value;
+                }
+                console.log(queryParams);
+                sendAjaxRequest();
+                modal2.style.display = "none";
+            }
+        });
+    }
+
+    var currencyImages = document.querySelectorAll('.currency-image');
     currencyImages.forEach(function (image) {
         image.onclick = function () {
             var selectedValue = this.getAttribute("data-value");
             var selectedSign = this.getAttribute("data-sign");
 
-            $.ajax({
-                type: "POST",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                url: "/Charts/GetSelectedFiats?FiatName=" + selectedValue,
-                success: function (data) {
-                    updateTable(data, selectedSign);
-                },
-                error: function () {
-                    alert("Помилка при завантаженні даних.");
-                }
-            });
+            // Додавання параметру до об'єкта queryParams
+            if (queryParams.hasOwnProperty("convert")) {
+                queryParams["convert"] = selectedValue;
+            } else {
+                // Якщо параметр не існує, додайте його
+                queryParams["convert"] = selectedValue;
+            }
+            console.log(queryParams);
+            // Відправлення запиту з поточними параметрами
+            sendAjaxRequest();
             modal.style.display = "none";
         };
     });
 
+    applyFilterButton.addEventListener("click", function () {
+        var minMarketCap = parseFloat(minMarketCapInput.value) || 0;
+        var maxMarketCap = parseFloat(maxMarketCapInput.value) || Number.POSITIVE_INFINITY;
+
+        // Додавання параметрів до об'єкта queryParams
+        if (queryParams.hasOwnProperty("market_cap_min") && queryParams.hasOwnProperty("market_cap_max")) {
+            // Якщо обидва параметри вже існують, оновлюємо їх значення
+            queryParams["market_cap_min"] = minMarketCap;
+            queryParams["market_cap_max"] = maxMarketCap;
+        } else {
+            // Якщо хоча б один з параметрів не існує, додаємо обидва параметри
+            queryParams["market_cap_min"] = minMarketCap;
+            queryParams["market_cap_max"] = maxMarketCap;
+        }
+        console.log(queryParams);
+        // Відправлення запиту з поточними параметрами
+        sendAjaxRequest();
+        modal2.style.display = "none";
+
+
+    });
+
+
+    // Функція для відправки AJAX-запиту
+    function sendAjaxRequest() {
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            url: "/Charts/GetFilteredResult?queryParams=" + JSON.stringify(queryParams),
+            success: function (data) {
+                cryptoTableBody.innerHTML = "";
+                updateTable(data, "$");
+            },
+            error: function () {
+                alert("Помилка при завантаженні даних.");
+            }
+        });
+    }
 
     function updateTable(data, selectedFiatSign) {
         // Очищаємо поточну таблицю
