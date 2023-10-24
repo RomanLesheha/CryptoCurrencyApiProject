@@ -313,3 +313,21 @@
     }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        // Ваш код для обробки натискання кнопки "Show Graph" (завантаження графіка)
+        $.ajax({
+            type: "POST",
+            url: "/Charts/GetCurrency",
+            dataType: "json",
+            success: function (response) {
+               
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    })
+</script>

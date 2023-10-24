@@ -72,6 +72,13 @@ namespace Coursework2.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> GetSelectedData(string ID)
+        {
+            var result = await _parseFunctional.ParseSelectedCurrency(ID);
+            return Json(result);
+        }
+
+        [HttpPost]
         public async Task<IActionResult> GetFiats()
         {
             var result = await _marketCapFunctional.GetCoinMarketCapFiatAsync();
