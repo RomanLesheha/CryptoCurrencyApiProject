@@ -16,3 +16,204 @@ html {
 body {
   margin-bottom: 60px;
 }
+/* Стилі для модального вікна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 10px;
+    border: 1px solid #888;
+    width: 50%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    /* Медіа запит для мобільної версії */
+}
+
+.close {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+    .close:hover {
+        color: red;
+    }
+
+.group-label {
+    font-weight: bold;
+}
+
+.group-divider {
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 10px 0;
+}
+
+.filter-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.toggle-button {
+    font-size: 20px;
+    line-height: 1;
+    background: none;
+    border: none;
+    outline: none;
+}
+
+.filter-content {
+    display: none;
+}
+
+.content-content {
+    display: flex; /* Зробити елементи блоку гнучким контейнером */
+    align-items: center; /* Вирівняти елементи по вертикалі по центру */
+}
+
+    .content-content p {
+        margin: 0 5px; /* Додати відступи між текстовими елементами */
+    }
+
+    .content-content input[type="number"] {
+        width: 30%; /* Задати ширину для полів введення чисел */
+    }
+
+
+/* Style radio buttons and labels */
+input[type="radio"] {
+    margin-right: 10px;
+}
+
+/* Style number inputs */
+input[type="number"] {
+    width: 50px;
+}
+
+button#applyFilter {
+    margin: 20px 0;
+    background-color: #0074cc;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+    button#applyFilter:hover {
+        background-color: #0056b3;
+    }
+
+.currencies {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Визначаємо кількість стовпців та розмір елементів */
+}
+/* Додаткові стилі для телефонного розміру екрану */
+
+.currency-image {
+    cursor: pointer; /* Змінює вид курсору на руку при наведенні */
+    transition: transform 0.2s; /* Додає плавний ефект при наведенні */
+}
+
+    .currency-image:hover {
+        transform: scale(1.1); /* Збільшує зображення при наведенні */
+    }
+
+    .currency-image:active {
+        transform: scale(0.9); /* Зменшує зображення при натисканні */
+    }
+
+.currency-item {
+    display: flex;
+    width: 90%;
+    align-items: center; /* Вирівнювання по вертикалі */
+    text-align: center;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.currency-image {
+    max-width: 40px;
+    max-height: 40px;
+    margin-right: 5px;
+}
+
+.currency-name {
+    font-size: 14px;
+    margin: 0;
+}
+
+.currency-sign {
+    font-size: 12px;
+    font-style: italic;
+    color: grey;
+    margin: 0;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+td.fixed-column, th.fixed-column {
+    position: sticky;
+    left: 0;
+    background-color: #fff; /* Додайте цю лінію */
+}
+
+.positive {
+    color: green; /* Колір для додатніх значень */
+}
+
+.negative {
+    color: red; /* Колір для від'ємних значень */
+}
+
+.neutral {
+    color: blue; /* Колір для нейтральних значень */
+}
+/* Додаткові стилі для телефонного розміру екрану */
+@media (max-width: 992px) {
+    .currencies {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 3fr)); /* Змінюємо кількість стовпців для телефону */
+    }
+
+    .modal-content {
+        width: 80%;
+    }
+}
+@media (max-width: 768px) {
+    .currencies {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 2fr)); /* Змінюємо кількість стовпців для телефону */
+    }
+    .modal-content {
+        width: 90%;
+    } 
+}
