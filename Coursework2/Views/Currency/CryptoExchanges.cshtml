@@ -1,0 +1,80 @@
+﻿@model ExchangeMetaData
+@using System.Globalization
+@{
+    CultureInfo cultureInfo = new CultureInfo("en-US");
+    var rank = 1;
+}
+<div class="container align-content-center justify-content-center">
+    <div class="table-container">
+        <table id="cryptoTable" class="custom-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Weekly Visitors</th>
+                    <th>Spot Volume</th>
+                    <th>Fiats Supported</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Data.Values)
+                {
+                    <tr data-id="@item.id">
+                        <td>@(rank++)</td>
+                        <td><img style="max-height:20px;max-width:20px;" src="@item.logo" /> @item.name</td>
+                        <td>@string.Format(cultureInfo,"{0:N0}",item.weekly_visits)</td>
+                        @if (item.spot_volume_usd.HasValue)
+                        {
+                            <td>@string.Format(cultureInfo,"{0:C0}",Math.Round(item.spot_volume_usd.Value))</td>
+                        }
+                        else
+                        {
+                            <td>No Information</td>
+                        }
+                        <td>@string.Join(", ",item.fiats.Take(5))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+<style>
+
+
+    th {
+        font-weight: bold;
+    }
+
+
+    .table-container {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    .custom-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        .custom-table th, .custom-table td {
+            padding: 8px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+    .fixed-column {
+        position: sticky;
+        left: 0;
+    }
+
+        .fixed-column:first-child {
+            z-index: 1;
+        }
+
+    th:nth-child(2), td:nth-child(2) {
+        position: sticky;
+        left: 7%; /* Визначте відстань від першої колонки */
+        z-index: 1;
+    }
+</style>

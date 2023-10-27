@@ -11,9 +11,14 @@ namespace Coursework2.Interfaces
         Task<CryptoCurrencyMetaData> GetCoinMarketCapMetaDataAsync(int CurrencyId);
 
         Task<CryptoCurrenciesListMetaData> GetCryptoCurrenciesListMetaAsync(Dictionary<string, object> queryParams);
+        Task<CryptoCurrenciesListMetaData> GetCurrenciesByTags(string tags);
 
         Task<PriceConversionData> GetPriceConversionDataAsync();
 
         Task<ExchangeMetaData> GetExchangeMetaDataAsync();
+
+        Task<CryptoCurrencyCategoryList> GetCryptoCurrencyCategoryListAsync();
+        Task<CryptoCurrencyCategoryMetaData> GetCryptoCurrencyCategoryMetaDataAsync(int CategoryID);
+
     }
 }

@@ -1,0 +1,443 @@
+﻿@model CryptoCurrenciesListMetaData
+@using Coursework2.Interfaces;
+@using System.Globalization;
+@inject ICoinMarketCapFunctional _service;
+@{
+    CultureInfo cultureInfo = new CultureInfo("en-US");
+    string formatstring(double price)
+    {
+        string formattedPrice;
+
+        if (price < 0.01)
+        {
+            formattedPrice = price.ToString("0.########"); // Закруглюємо до 9 знаків після коми
+        }
+        else
+        {
+            formattedPrice = price.ToString("0.00"); // Закруглюємо до 2 знаків після коми
+        }
+
+        string formattedPriceString = $"${formattedPrice:#,0.00}";
+        return formattedPriceString;
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container align-content-center justify-content-center">
+        <button id="openModalButton">Select Currency</button>
+        <button id="openModal2Button">Filters</button>
+        <button class="crypto-button" data-tags="bitcoin-ecosystem">🔥Bitcoin Ecosystem</button>
+        <button class="crypto-button" data-tags="ftx-bankruptcy-estate">🔥FTX Bankruptcy Estate</button>
+        <button class="crypto-button" data-tags="real-world-assets">🔥Real World Assets</button>
+        <button class="crypto-button" data-tags="telegram-bot">🔥Telegram Bot</button>
+        <!-- Модальне вікно -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" data-modal="myModal">&times;</span>
+                <div class="image-list">
+                    <p class="group-label">FIAT CURRENCY</p>
+                    <hr class="group-divider" />
+                    <div class="currencies">
+                        <div class="currency-item">
+                            <img src="/Image/USD.png" data-value="USD" data-sign="$" class="currency-image" />
+                            <div class="d-block">
+                                <p class="currency-name">United States Dollar</p>
+                                <p class="currency-sign">USD - $</p>
+                            </div>
+                        </div>
+                        <div class="currency-item">
+                            <img src="/Image/EUR.png" data-value="EUR" data-sign="€" class="currency-image" />
+                            <div class="d-block">
+                                <p class="currency-name">Euro</p>
+                                <p class="currency-sign">EUR - €</p>
+                            </div>
+                        </div>
+                        <div class="currency-item">
+                            <img src="/Image/UAN.png" data-value="UAH" data-sign="₴" class="currency-image" />
+                            <div class="d-block">
+                                <p class="currency-name">Ukrainian Hryvnia</p>
+                                <p class="currency-sign">UAH - ₴</p>
+                            </div>
+                        </div>
+                        <div class="currency-item">
+                            <img src="/Image/BRL.png" data-value="BRL" data-sign="R$" class="currency-image" />
+                            <div class="d-block">
+                                <p class="currency-name">Brazilian Real</p>
+                                <p class="currency-sign">BRL - R$</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="group-label">CRYPTO CURRENCY</p>
+                    <hr class="group-divider" />
+                    <div class="currencies">
+                        <div class="currency-item">
+                            <img src="/Image/BTC.png" data-value="BTC" data-sign="BTC" class="currency-image" />
+                            <div class="d-block">
+                                <p class="currency-name">Bitcoin</p>
+                                <p class="currency-sign">BTC</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальне вікно -->
+        <div id="myModal2" class="modal">
+            <div class="modal-content">
+                <span class="close" data-modal="myModal2">&times;</span>
+                <p class="group-label">More Filters</p>
+                <hr class="group-divider" />
+                <div class="filter-group">
+                    <p>Cryptocurrency Type</p>
+                    <button class="toggle-button">&#9660</button>
+                </div>
+                <div class="filter-content">
+                    <form id="cryptoForm" method="post">
+                        <input type="radio" id="all" name="cryptocurrency_type" value="all">
+                        <label for="all">All cryptocurrencies</label><br>
+                        <input type="radio" id="coins" name="cryptocurrency_type" value="coins">
+                        <label for="coins">Coins</label><br>
+                        <input type="radio" id="tokens" name="cryptocurrency_type" value="tokens">
+                        <label for="tokens">Tokens</label>
+                    </form>
+                </div>
+                <div class="filter-group">
+                    <p>Market Cap Range</p>
+                    <button class="toggle-button">&#9660</button>
+                </div>
+                <div class="filter-content">
+                    <p style="font-size:larger">Market Cap Range</p>
+                    <div class="content-content">
+                        <input type="number" name="marketCapRange" id="minMarketCap" placeholder="Min" />
+                        <p>to</p>
+                        <input type="number" name="marketCapRange" id="maxMarketCap" placeholder="Max" />
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <p>Price</p>
+                    <button class="toggle-button">&#9660</button>
+                </div>
+                <div class="filter-content">
+                    <p style="font-size:larger">Price</p>
+                    <div class="content-content">
+                        <input type="number" name="price" id="minprice" placeholder="Min" />
+                        <p>to</p>
+                        <input type="number" name="price" id="maxprice" placeholder="Max" />
+                    </div>
+                </div>
+                <button id="applyFilter">Apply Filter</button>
+            </div>
+        </div>
+
+
+        <div class="table-responsive">
+            <table id="cryptoTable" class="table custom-table">
+                <!-- Заголовок таблиці -->
+                <thead>
+                    <tr>
+                        <th class="fixed-column"></th>
+                        <th class="fixed-column">Rank</th>
+                        <th class="fixed-column">Name</th>
+                        <th>Price</th>
+                        <th>% 1h</th>
+                        <th>% 24h</th>
+                        <th>% 7d</th>
+                        <th>Market Cap</th>
+                        <th>Circulating Supply</th>
+                        <th>Volume(24h)</th>
+
+                    </tr>
+                </thead>
+                <!-- Тіло таблиці -->
+                <tbody id="cryptoTableBody">
+                    @foreach (var crypto in Model.data)
+                    {
+                        <tr data-id="@crypto.id" class="table-row">
+                            <td class="fixed-column"><span class="star" id="addtofavouritebtn" data-id="@crypto.id">☆</span></td>
+                            <td class="fixed-column">@crypto.cmc_rank</td>
+                            <td class="fixed-column"><img style="max-height:20px;max-width:20px;" src="@crypto.urlLogo" /> <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.name  @crypto.symbol</a></td>
+                            <td>@crypto.quote.First().Value.price.ToString("N6")$</td>
+                            <td class="@((crypto.quote.First().Value.percent_change_1h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_1h < 0) ? "negative" : "neutral")">
+                                @crypto.quote.First().Value.percent_change_1h.ToString("N2")%
+                            </td>
+                            <td class="@((crypto.quote.First().Value.percent_change_24h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
+                                @crypto.quote.First().Value.percent_change_24h.ToString("N2")%
+                            </td>
+                            <td class="@((crypto.quote.First().Value.percent_change_7d > 0) ? "positive" : (crypto.quote.First().Value.percent_change_7d < 0) ? "negative" : "neutral")">
+                                @crypto.quote.First().Value.percent_change_7d.ToString("N2")%
+                            </td>
+                            <td style=" color: blue;">@string.Format(cultureInfo, "{0:C0}", @crypto.quote.First().Value.market_cap)</td>
+                            <td>@string.Format("{0:#,0}",@Math.Round(crypto.circulating_supply)) @crypto.symbol</td>
+                            <td>@string.Format("${0:#,0}", crypto.quote.First().Value.volume_24h)</td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>
+<style>
+    .star:hover {
+        color: yellow;
+        cursor: pointer;
+    }
+    .active_star{
+        color:yellow;
+        font-weight:800;
+    }
+</style>
+<script type="text/javascript">
+
+    // Отримуємо необхідні елементи DOM
+    var modal = document.getElementById("myModal");
+    var modal2 = document.getElementById("myModal2");
+    var closeModalButtons = document.getElementsByClassName("close");
+    var currencyImages = document.querySelectorAll(".currency-image");
+    
+    var minMarketCapInput = document.getElementById("minMarketCap");
+    var maxMarketCapInput = document.getElementById("maxMarketCap");
+
+    var minPriceInput = document.getElementById("minprice");
+    var maxPriceInput = document.getElementById("maxprice");
+
+    var applyFilterButton = document.getElementById("applyFilter");
+
+    var bitcoinEcoQuery = document.getElementById("bitcoinEcoQuery");
+
+
+    for (var i = 0; i < closeModalButtons.length; i++) {
+        closeModalButtons[i].addEventListener("click", function () {
+            var modalId = this.getAttribute("data-modal");
+            var modal = document.getElementById(modalId);
+            modal.style.display = "none";
+        });
+    }
+    // Відкриття модального вікна для вибору ціни
+    openModalButton.onclick = function () {
+        modal.style.display = "block";
+    };
+
+    // Відкриття модального вікна для фільтрів
+    openModal2Button.onclick = function () {
+        modal2.style.display = "block";
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Знаходимо всі кнопки для зміни відображення блоків
+        var toggleButtons = document.querySelectorAll('.toggle-button');
+
+        // Додаємо обробник подій для кожної кнопки
+        toggleButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                // Знаходимо батьківський елемент (групу)
+                var group = this.closest('.filter-group');
+
+                // Знаходимо блок фільтра, який повинен бути відображений або прихований
+                var filterContent = group.nextElementSibling;
+
+                // Перевіряємо поточний стиль display блоку фільтра
+                if (filterContent.style.display === 'block' || filterContent.style.display === '') {
+                    filterContent.style.display = 'none';
+                    this.innerHTML = '&#9660'; // Змінюємо текст кнопки на стрілочку вниз
+                } else {
+                    filterContent.style.display = 'block';
+                    this.innerHTML = '&#9650'; // Змінюємо текст кнопки на стрілочку вверх
+                }
+            });
+        });
+    });
+
+    // Об'єкт для зберігання параметрів
+    var queryParams = {};
+
+    var radioButtons = document.querySelectorAll('input[name="cryptocurrency_type"]');
+    for (var i = 0; i < radioButtons.length; i++) {
+        radioButtons[i].addEventListener("change", function () {
+            var selectedCryptoType = document.querySelector('input[name="cryptocurrency_type"]:checked');
+            if (selectedCryptoType) {
+                // Додавання параметру до об'єкта queryParams
+                if (queryParams.hasOwnProperty("cryptocurrency_type")) {
+                    queryParams["cryptocurrency_type"] = selectedCryptoType.value;
+                } else {
+                    // Якщо параметр не існує, додайте його
+                    queryParams["cryptocurrency_type"] = selectedCryptoType.value;
+                }
+                console.log(queryParams);
+                sendAjaxRequest();
+                modal2.style.display = "none";
+            }
+        });
+    }
+
+    var currencyImages = document.querySelectorAll('.currency-image');
+    currencyImages.forEach(function (image) {
+        image.onclick = function () {
+            var selectedValue = this.getAttribute("data-value");
+            var selectedSign = this.getAttribute("data-sign");
+
+            // Додавання параметру до об'єкта queryParams
+            if (queryParams.hasOwnProperty("convert")) {
+                queryParams["convert"] = selectedValue;
+            } else {
+                // Якщо параметр не існує, додайте його
+                queryParams["convert"] = selectedValue;
+            }
+            console.log(queryParams);
+            // Відправлення запиту з поточними параметрами
+            sendAjaxRequest(selectedSign);
+            modal.style.display = "none";
+        };
+    });
+    var addToFavouriteBtn = document.querySelectorAll("#addtofavouritebtn");
+    var stateMap = {}; // Об'єкт для зберігання стану кожної зірочки
+
+    for (var i = 0; i < addToFavouriteBtn.length; i++) {
+        var btn = addToFavouriteBtn[i];
+        var cryptoId = btn.getAttribute("data-id");
+
+        // Ініціалізуємо стан на початку
+        stateMap[cryptoId] = false;
+
+        btn.addEventListener("click", function () {
+            if (!stateMap[cryptoId]) {
+                this.textContent = "★";
+                stateMap[cryptoId] = true;
+                this.classList.add("active_star");
+            } else {
+                this.textContent = "☆";
+                stateMap[cryptoId] = false;
+                this.classList.remove("active_star");
+            }
+        });
+    }
+
+
+    applyFilterButton.addEventListener("click", function () {
+        var minMarketCap = parseFloat(minMarketCapInput.value) || 0;
+        var maxMarketCap = parseFloat(maxMarketCapInput.value) || Number.POSITIVE_INFINITY;
+
+        var minPrice = parseFloat(minPriceInput.value) || 0;
+        var maxPrice = parseFloat(maxPriceInput.value) || Number.POSITIVE_INFINITY;
+
+        // Додавання параметрів до об'єкта queryParams
+        if (queryParams.hasOwnProperty("price_min") && queryParams.hasOwnProperty("price_max")) {
+            // Якщо обидва параметри вже існують, оновлюємо їх значення
+            queryParams["price_min"] = minPrice;
+            queryParams["price_max"] = maxPrice;
+        } else {
+            // Якщо хоча б один з параметрів не існує, додаємо обидва параметри
+            queryParams["price_min"] = minPrice;
+            queryParams["price_max"] = maxPrice;
+        }
+
+        // Додавання параметрів до об'єкта queryParams
+        if (queryParams.hasOwnProperty("market_cap_min") && queryParams.hasOwnProperty("market_cap_max")) {
+            // Якщо обидва параметри вже існують, оновлюємо їх значення
+            queryParams["market_cap_min"] = minMarketCap;
+            queryParams["market_cap_max"] = maxMarketCap;
+        } else {
+            // Якщо хоча б один з параметрів не існує, додаємо обидва параметри
+            queryParams["market_cap_min"] = minMarketCap;
+            queryParams["market_cap_max"] = maxMarketCap;
+        }
+        console.log(queryParams);
+        // Відправлення запиту з поточними параметрами
+        sendAjaxRequest();
+        modal2.style.display = "none";
+
+
+    });
+
+    var cryptoButtons = document.querySelectorAll(".crypto-button");
+
+    // Додаємо обробник подій для кожної кнопки
+    cryptoButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            // Отримуємо значення параметру tags з атрибуту data
+            var tags = button.getAttribute("data-tags");
+
+            // Виконуємо AJAX-запит і передаємо параметр tags
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                url: "/Currency/GetBitcoinEcoSystem?tags=" + tags,
+                success: function (data) {
+                    cryptoTableBody.innerHTML = "";
+                    updateTable(data, "$");
+                },
+                error: function () {
+                    alert("Помилка при завантаженні даних.");
+                }
+            });
+        });
+    });
+
+    // Функція для відправки AJAX-запиту
+    function sendAjaxRequest(selectedSign) {
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            url: "/Currency/GetFilteredResult?queryParams=" + JSON.stringify(queryParams),
+            success: function (data) {
+                cryptoTableBody.innerHTML = "";
+                updateTable(data, selectedSign);
+            },
+            error: function () {
+                alert("Помилка при завантаженні даних.");
+            }
+        });
+    }
+
+    function updateTable(data, selectedFiatSign) {
+        // Очищаємо поточну таблицю
+        $("#cryptoTable tbody").empty();
+
+        // Перебираємо нові дані і заповнюємо таблицю
+        $.each(data.data, function (index, crypto) {
+            var quote = Object.values(crypto.quote)[0];
+            var row = '<tr data-id="' + crypto.id + '">'
+                + '<td class="fixed-column">' + crypto.cmc_rank + '</td>'
+                + '<td class="fixed-column"><img style="max-height:20px;max-width:20px;" src="' + crypto.urlLogo + '"/> ' + crypto.name + '</td>'
+                + '<td>' + crypto.symbol + '</td>'
+                + '<td>' + formatCurrency(quote.price, selectedFiatSign, 4) + '</td>'
+                + '<td class="' + getChangeClass(quote.percent_change_1h) + '">' + quote.percent_change_1h.toFixed(2) + '%</td>'
+                + '<td class="' + getChangeClass(quote.percent_change_24h) + '">' + quote.percent_change_24h.toFixed(2) + '%</td>'
+                + '<td class="' + getChangeClass(quote.percent_change_7d) + '">' + quote.percent_change_7d.toFixed(2) + '%</td>'
+                + '<td style=" color: blue;">' + formatCurrency(quote.market_cap, selectedFiatSign) + '</td>'
+                + '<td>' + formatNumber(crypto.circulating_supply) + ' ' + crypto.symbol + '</td>'
+                + '<td>' + formatCurrency(quote.volume_24h, selectedFiatSign) + '</td>'
+                + '</tr>';
+            $("#cryptoTable tbody").append(row);
+        });
+    }
+
+    // Допоміжні функції для форматування та визначення класу для зміни
+    function formatCurrency(value, symbol, decimals = 0) {
+        return value.toFixed(decimals).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ' + symbol;
+    }
+
+    function formatNumber(value) {
+        return value.toFixed(0).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+
+    function getChangeClass(value) {
+        if (value > 0) return 'positive';
+        if (value < 0) return 'negative';
+        return 'neutral';
+    }
+</script>
+
+

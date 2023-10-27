@@ -1,6 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@if (ViewBag.Id != null)
+{
+    <h1>@ViewBag.Id</h1>
+}
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
