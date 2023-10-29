@@ -1,4 +1,4 @@
-html {
+п»їhtml {
   font-size: 14px;
 }
 
@@ -16,7 +16,7 @@ html {
 body {
   margin-bottom: 60px;
 }
-/* Стилі для модального вікна */
+/* РЎС‚РёР»С– РґР»СЏ РјРѕРґР°Р»СЊРЅРѕРіРѕ РІС–РєРЅР° */
 .modal {
     display: none;
     position: fixed;
@@ -36,7 +36,7 @@ body {
     border: 1px solid #888;
     width: 50%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    /* Медіа запит для мобільної версії */
+    /* РњРµРґС–Р° Р·Р°РїРёС‚ РґР»СЏ РјРѕР±С–Р»СЊРЅРѕС— РІРµСЂСЃС–С— */
 }
 
 .close {
@@ -80,16 +80,16 @@ body {
 }
 
 .content-content {
-    display: flex; /* Зробити елементи блоку гнучким контейнером */
-    align-items: center; /* Вирівняти елементи по вертикалі по центру */
+    display: flex; /* Р—СЂРѕР±РёС‚Рё РµР»РµРјРµРЅС‚Рё Р±Р»РѕРєСѓ РіРЅСѓС‡РєРёРј РєРѕРЅС‚РµР№РЅРµСЂРѕРј */
+    align-items: center; /* Р’РёСЂС–РІРЅСЏС‚Рё РµР»РµРјРµРЅС‚Рё РїРѕ РІРµСЂС‚РёРєР°Р»С– РїРѕ С†РµРЅС‚СЂСѓ */
 }
 
     .content-content p {
-        margin: 0 5px; /* Додати відступи між текстовими елементами */
+        margin: 0 5px; /* Р”РѕРґР°С‚Рё РІС–РґСЃС‚СѓРїРё РјС–Р¶ С‚РµРєСЃС‚РѕРІРёРјРё РµР»РµРјРµРЅС‚Р°РјРё */
     }
 
     .content-content input[type="number"] {
-        width: 30%; /* Задати ширину для полів введення чисел */
+        width: 30%; /* Р—Р°РґР°С‚Рё С€РёСЂРёРЅСѓ РґР»СЏ РїРѕР»С–РІ РІРІРµРґРµРЅРЅСЏ С‡РёСЃРµР» */
     }
 
 
@@ -119,27 +119,27 @@ button#applyFilter {
 .currencies {
     display: grid;
     gap: 10px;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Визначаємо кількість стовпців та розмір елементів */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Р’РёР·РЅР°С‡Р°С”РјРѕ РєС–Р»СЊРєС–СЃС‚СЊ СЃС‚РѕРІРїС†С–РІ С‚Р° СЂРѕР·РјС–СЂ РµР»РµРјРµРЅС‚С–РІ */
 }
-/* Додаткові стилі для телефонного розміру екрану */
+/* Р”РѕРґР°С‚РєРѕРІС– СЃС‚РёР»С– РґР»СЏ С‚РµР»РµС„РѕРЅРЅРѕРіРѕ СЂРѕР·РјС–СЂСѓ РµРєСЂР°РЅСѓ */
 
 .currency-image {
-    cursor: pointer; /* Змінює вид курсору на руку при наведенні */
-    transition: transform 0.2s; /* Додає плавний ефект при наведенні */
+    cursor: pointer; /* Р—РјС–РЅСЋС” РІРёРґ РєСѓСЂСЃРѕСЂСѓ РЅР° СЂСѓРєСѓ РїСЂРё РЅР°РІРµРґРµРЅРЅС– */
+    transition: transform 0.2s; /* Р”РѕРґР°С” РїР»Р°РІРЅРёР№ РµС„РµРєС‚ РїСЂРё РЅР°РІРµРґРµРЅРЅС– */
 }
 
     .currency-image:hover {
-        transform: scale(1.1); /* Збільшує зображення при наведенні */
+        transform: scale(1.1); /* Р—Р±С–Р»СЊС€СѓС” Р·РѕР±СЂР°Р¶РµРЅРЅСЏ РїСЂРё РЅР°РІРµРґРµРЅРЅС– */
     }
 
     .currency-image:active {
-        transform: scale(0.9); /* Зменшує зображення при натисканні */
+        transform: scale(0.9); /* Р—РјРµРЅС€СѓС” Р·РѕР±СЂР°Р¶РµРЅРЅСЏ РїСЂРё РЅР°С‚РёСЃРєР°РЅРЅС– */
     }
 
 .currency-item {
     display: flex;
     width: 90%;
-    align-items: center; /* Вирівнювання по вертикалі */
+    align-items: center; /* Р’РёСЂС–РІРЅСЋРІР°РЅРЅСЏ РїРѕ РІРµСЂС‚РёРєР°Р»С– */
     text-align: center;
     margin: 10px;
     padding: 10px;
@@ -185,24 +185,57 @@ tr:hover {
 td.fixed-column, th.fixed-column {
     position: sticky;
     left: 0;
-    background-color: #fff; /* Додайте цю лінію */
+    background-color: #fff; /* Р”РѕРґР°Р№С‚Рµ С†СЋ Р»С–РЅС–СЋ */
 }
 
 .positive {
-    color: green; /* Колір для додатніх значень */
+    color: green; /* РљРѕР»С–СЂ РґР»СЏ РґРѕРґР°С‚РЅС–С… Р·РЅР°С‡РµРЅСЊ */
 }
 
+
 .negative {
-    color: red; /* Колір для від'ємних значень */
+    color: red; /* РљРѕР»С–СЂ РґР»СЏ РІС–Рґ'С”РјРЅРёС… Р·РЅР°С‡РµРЅСЊ */
 }
 
 .neutral {
-    color: blue; /* Колір для нейтральних значень */
+    color: blue; /* РљРѕР»С–СЂ РґР»СЏ РЅРµР№С‚СЂР°Р»СЊРЅРёС… Р·РЅР°С‡РµРЅСЊ */
 }
-/* Додаткові стилі для телефонного розміру екрану */
+
+.crypto-button-container {
+    display: flex;
+    overflow: auto; /* Enable horizontal scrolling if necessary */
+}
+
+.crypto-button {
+    padding: 10px;
+    white-space: nowrap;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: background-color ease-in-out 0.5s; /* Add a smooth transition effect */
+    border-radius:10px;
+}
+
+    .crypto-button:hover {
+        background-color: #bfbfbf; /* Change the background color when hovering */
+    }
+
+/* Hide scrollbar in webkit-based browsers */
+.crypto-button-container::-webkit-scrollbar {
+    width: 8px; /* Adjust as needed */
+}
+
+.crypto-button-container::-webkit-scrollbar-thumb {
+    background: transparent; /* Hide scrollbar thumb */
+}
+@media (max-width: 768px) {
+    .crypto-button-container {
+        flex-wrap: nowrap; /* Prevent wrapping on smaller screens */
+    }
+}
+/* Р”РѕРґР°С‚РєРѕРІС– СЃС‚РёР»С– РґР»СЏ С‚РµР»РµС„РѕРЅРЅРѕРіРѕ СЂРѕР·РјС–СЂСѓ РµРєСЂР°РЅСѓ */
 @media (max-width: 992px) {
     .currencies {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 3fr)); /* Змінюємо кількість стовпців для телефону */
+        grid-template-columns: repeat(auto-fill, minmax(250px, 3fr)); /* Р—РјС–РЅСЋС”РјРѕ РєС–Р»СЊРєС–СЃС‚СЊ СЃС‚РѕРІРїС†С–РІ РґР»СЏ С‚РµР»РµС„РѕРЅСѓ */
     }
 
     .modal-content {
@@ -211,7 +244,7 @@ td.fixed-column, th.fixed-column {
 }
 @media (max-width: 768px) {
     .currencies {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 2fr)); /* Змінюємо кількість стовпців для телефону */
+        grid-template-columns: repeat(auto-fill, minmax(300px, 2fr)); /* Р—РјС–РЅСЋС”РјРѕ РєС–Р»СЊРєС–СЃС‚СЊ СЃС‚РѕРІРїС†С–РІ РґР»СЏ С‚РµР»РµС„РѕРЅСѓ */
     }
     .modal-content {
         width: 90%;

@@ -33,10 +33,12 @@
     <div class="container align-content-center justify-content-center">
         <button id="openModalButton">Select Currency</button>
         <button id="openModal2Button">Filters</button>
-        <button class="crypto-button" data-tags="bitcoin-ecosystem">🔥Bitcoin Ecosystem</button>
-        <button class="crypto-button" data-tags="ftx-bankruptcy-estate">🔥FTX Bankruptcy Estate</button>
-        <button class="crypto-button" data-tags="real-world-assets">🔥Real World Assets</button>
-        <button class="crypto-button" data-tags="telegram-bot">🔥Telegram Bot</button>
+        <div class="crypto-button-container">
+            <span class="crypto-button" data-tags="bitcoin-ecosystem">🔥Bitcoin Ecosystem</span>
+            <span class="crypto-button" data-tags="ftx-bankruptcy-estate">🔥FTX Bankruptcy Estate</span>
+            <span class="crypto-button" data-tags="real-world-assets">🔥Real World Assets</span>
+            <span class="crypto-button" data-tags="telegram-bot">🔥Telegram Bot</span>
+        </div>
         <!-- Модальне вікно -->
         <div id="myModal" class="modal">
             <div class="modal-content">
@@ -196,6 +198,24 @@
         color:yellow;
         font-weight:800;
     }
+    /* Style for price increase */
+    /* Style for price increase */
+    .price-up {
+        color: green; /* Change text color for price increase */
+        transition: color 3s ease-in-out;
+        font-weight:500;
+    }
+
+    /* Style for price decrease */
+    .price-down {
+        color: red; /* Change text color for price decrease */
+        transition: color 3s ease-in-out;
+        font-weight: 500;
+    }
+
+    
+
+  
 </style>
 <script type="text/javascript">
 
@@ -260,6 +280,32 @@
 
     // Об'єкт для зберігання параметрів
     var queryParams = {};
+    var selectedSign;
+
+    function updateTablePeriodically() {
+        // Call the updateTable function here with your data and selectedFiatSign
+        // Replace the following example data and selectedFiatSign with your actual data and sign
+        if (selectedSign == null)
+            selectedSign = "$"
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            url: "/Currency/GetFilteredResult?queryParams=" + JSON.stringify(queryParams),
+            success: function (data) {
+                cryptoTableBody.innerHTML = "";
+                updateTable(data, selectedSign);
+            },
+            error: function () {
+                alert("Помилка при завантаженні даних.");
+            }
+        });
+    }
+    updateTablePeriodically();
+
+    // Set an interval to call the function 
+    setInterval(updateTablePeriodically, 60000);
 
     var radioButtons = document.querySelectorAll('input[name="cryptocurrency_type"]');
     for (var i = 0; i < radioButtons.length; i++) {
@@ -274,17 +320,19 @@
                     queryParams["cryptocurrency_type"] = selectedCryptoType.value;
                 }
                 console.log(queryParams);
-                sendAjaxRequest();
+                sendAjaxRequest(selectedSign);
                 modal2.style.display = "none";
             }
         });
     }
 
+   
+
     var currencyImages = document.querySelectorAll('.currency-image');
     currencyImages.forEach(function (image) {
         image.onclick = function () {
             var selectedValue = this.getAttribute("data-value");
-            var selectedSign = this.getAttribute("data-sign");
+            selectedSign = this.getAttribute("data-sign"); // Update the global variable
 
             // Додавання параметру до об'єкта queryParams
             if (queryParams.hasOwnProperty("convert")) {
@@ -295,7 +343,7 @@
             }
             console.log(queryParams);
             // Відправлення запиту з поточними параметрами
-            sendAjaxRequest(selectedSign);
+            sendAjaxRequest(selectedSign); // Use the updated value
             modal.style.display = "none";
         };
     });
@@ -353,7 +401,7 @@
         }
         console.log(queryParams);
         // Відправлення запиту з поточними параметрами
-        sendAjaxRequest();
+        sendAjaxRequest(selectedSign);
         modal2.style.display = "none";
 
 
@@ -375,7 +423,7 @@
                 url: "/Currency/GetBitcoinEcoSystem?tags=" + tags,
                 success: function (data) {
                     cryptoTableBody.innerHTML = "";
-                    updateTable(data, "$");
+                    updateTable(data, selectedSign);
                 },
                 error: function () {
                     alert("Помилка при завантаженні даних.");
@@ -409,10 +457,10 @@
         $.each(data.data, function (index, crypto) {
             var quote = Object.values(crypto.quote)[0];
             var row = '<tr data-id="' + crypto.id + '">'
+                + '<td class="fixed-column"><span class="star" id="addtofavouritebtn" data-id="' + crypto.id + '">☆</span></td>'
                 + '<td class="fixed-column">' + crypto.cmc_rank + '</td>'
-                + '<td class="fixed-column"><img style="max-height:20px;max-width:20px;" src="' + crypto.urlLogo + '"/> ' + crypto.name + '</td>'
-                + '<td>' + crypto.symbol + '</td>'
-                + '<td>' + formatCurrency(quote.price, selectedFiatSign, 4) + '</td>'
+                + '<td class="fixed-column"><img style="max-height:20px;max-width:20px;" src="' + crypto.urlLogo + '"/> <a href="/Currency/CryptoCurrencyDetails/?CurrencyID=' + crypto.id + '">' + crypto.name + ' ' + crypto.symbol + '</a></td>'
+                + '<td>' + formatCurrency(quote.price, selectedFiatSign, 6) + '</td>'
                 + '<td class="' + getChangeClass(quote.percent_change_1h) + '">' + quote.percent_change_1h.toFixed(2) + '%</td>'
                 + '<td class="' + getChangeClass(quote.percent_change_24h) + '">' + quote.percent_change_24h.toFixed(2) + '%</td>'
                 + '<td class="' + getChangeClass(quote.percent_change_7d) + '">' + quote.percent_change_7d.toFixed(2) + '%</td>'
@@ -420,7 +468,24 @@
                 + '<td>' + formatNumber(crypto.circulating_supply) + ' ' + crypto.symbol + '</td>'
                 + '<td>' + formatCurrency(quote.volume_24h, selectedFiatSign) + '</td>'
                 + '</tr>';
-            $("#cryptoTable tbody").append(row);
+
+            var newRow = $(row); // Convert the row string to a jQuery element
+            $("#cryptoTable tbody").append(newRow);
+
+            var currentPrice = quote.price;
+            var previousPrice = parseFloat(newRow.find("td").eq(3).text().replace(/[^\d.-]/g, ''));
+            var priceCell = newRow.find("td").eq(3); // Select the cell containing the price
+
+            if (currentPrice > previousPrice) {
+                priceCell.addClass("price-up");
+            } else if (currentPrice < previousPrice) {
+                priceCell.addClass("price-down");
+            }
+
+            // Remove the color classes after a few seconds
+            setTimeout(function () {
+                priceCell.removeClass("price-up price-down");
+            }, 3000); // Change the color back after 3 seconds (adjust as needed)
         });
     }
 

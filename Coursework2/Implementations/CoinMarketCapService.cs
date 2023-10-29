@@ -4,6 +4,7 @@ using Coursework2.Interfaces;
 using Coursework2.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Web;
+using static System.Net.WebRequestMethods;
 
 namespace Coursework2.Realizations
 {
@@ -279,6 +280,27 @@ namespace Coursework2.Realizations
                 }; 
 
                 var response = await _apiParser.GetApiParser(ApiServiceFactory.ApiParserType.CoinMarketCap).ParseAsync<CryptoCurrencyCategoryMetaData>(_keyFactory.BuildUrl(endpoint, queryParams));
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Something went wrong at the data parsing stage");
+            }
+        }
+
+        public async Task<CryptoGlobalMetricsData> GetGlobalMetricsAsync()
+        {
+            string apiKey = await _keyFactory.GetNextValidAPIKeyAsync();
+
+            try
+            {
+                string endpoint = "v1/global-metrics/quotes/latest";
+                var queryParams = new Dictionary<string, object>
+                {
+
+                };
+
+                var response = await _apiParser.GetApiParser(ApiServiceFactory.ApiParserType.CoinMarketCap).ParseAsync<CryptoGlobalMetricsData>(_keyFactory.BuildUrl(endpoint, queryParams));
                 return response;
             }
             catch (Exception ex)

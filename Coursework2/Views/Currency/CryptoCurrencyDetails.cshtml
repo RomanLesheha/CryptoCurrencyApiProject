@@ -1,16 +1,38 @@
 ﻿@model CryptoCurrencyMetaData
-<p id="id">@Model.Data.First().Value.Slug</p>
-<select id="history" class="form-control">
-    <option value="" disabled selected>Select Currency History Interval</option>
-    <option value="m1">1 minute</option>
-    <option value="m15">15 minute</option>
-    <option value="m30">30 minute</option>
-    <option value="h1">1 hour</option>
-    <option value="h6">6 hour</option>
-    <option value="h12">12 hour</option>
-    <option value="d1">1 day</option>
-</select>
-<canvas id="myChart" style="max-height: fit-content; max-width: fit-content;"></canvas>
+
+
+<div class="container d-flex">
+    <div class="currency-detail">
+        <p style="display:none" id="id">@Model.Data.First().Value.Slug</p>
+
+    </div>
+    <div class="currency-charts">
+        <select id="history" class="form-control">
+            <option value="" disabled selected>Select Currency History Interval</option>
+            <option value="m1">1 minute</option>
+            <option value="m15">15 minute</option>
+            <option value="m30">30 minute</option>
+            <option value="h1">1 hour</option>
+            <option value="h6">6 hour</option>
+            <option value="h12">12 hour</option>
+            <option value="d1">1 day</option>
+        </select>
+        <canvas id="myChart" style="max-height: fit-content; max-width: fit-content;"></canvas>
+    </div>
+</div>
+
+
+<style>
+    .currency-detail{
+        display:block;
+        width:40%
+    }
+
+    .currency-charts{
+        display: block;
+        width: 60%
+    }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.js"></script>

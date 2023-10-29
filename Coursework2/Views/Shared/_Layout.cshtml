@@ -1,4 +1,32 @@
-﻿
+﻿@using Coursework2.Interfaces
+@inject ICoinMarketCapFunctional _marketfunctional;
+@{
+    var data = await _marketfunctional.GetGlobalMetricsAsync();
+    string FormatNumber(double number)
+    {
+        if (number >= 1e12)
+        {
+            double trillions = number / 1e12;
+            return $"{trillions:F1}T+";
+        }
+        if (number >= 1e9)
+        {
+            double billions = number / 1e9;
+            return $"{billions:F1}B+";
+        }
+        if (number >= 1e6)
+        {
+            double millions = number / 1e6;
+            return $"{millions:F1}M+";
+        }
+        if (number >= 1e3)
+        {
+            double thousands = number / 1e3;
+            return $"{thousands:F1}K+";
+        }
+        return $"{number:F1}+";
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +38,35 @@
     <link rel="stylesheet" href="~/Coursework2.styles.css" asp-append-version="true" />
 </head>
 <body>
+    <div class="align-content-center justify-content-center" style="max-height: 1.5em; overflow: hidden;">
+        <div class="container-fluid  crypto-button-container">
+            <ul class="d-flex flex-grow-1">
+                <li class="d-flex globaldata">
+                    <p style="white-space: nowrap;">Cryptos:</p>
+                    <p class="globaldatatext">@data.Data.active_cryptocurrencies<p />
+                </li>
+                <li class="d-flex globaldata">
+                    <p style="white-space: nowrap;">Exchanges: </p>
+                    <p class="globaldatatext">@data.Data.active_exchanges</p>
+                </li>
+                <li class="d-flex globaldata">
+                    <p style="white-space: nowrap;">Market Cap:</p>
+                    <p class="globaldatatext">@FormatNumber(@data.Data.Quote.First().Value.total_market_cap)</p> <p class="@((@data.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change > 0) ? "positive" : (@data.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change < 0) ? "negative" : "neutral")"> @data.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change.ToString("N2")%</p>
+                </li>
+                <li class="d-flex globaldata">
+                    <p style="white-space: nowrap;">24h Volume:</p>
+                    <p class="globaldatatext">@FormatNumber(@data.Data.Quote.First().Value.total_volume_24h)</p> <p class="@((@data.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change > 0) ? "positive" : (@data.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change < 0) ? "negative" : "neutral")"> @data.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change.ToString("N2")%</p>
+                </li>
+                <li class="d-flex globaldata">
+                    <p style="white-space: nowrap;">Dominance:</p>
+                    <p class="globaldatatext">BTC:@data.Data.btc_dominance.ToString("N2")%</p> <p class="@((@data.Data.btc_dominance_24h_percentage_change > 0) ? "positive" : (@data.Data.btc_dominance_24h_percentage_change < 0) ? "negative" : "neutral")"> @data.Data.btc_dominance_24h_percentage_change.ToString("N2")%</p>
+                </li>
+                <li class="d-flex globaldata">
+                    <p class="globaldatatext">ETH:@data.Data.eth_dominance.ToString("N2")%</p> <p class="@((@data.Data.eth_dominance_24h_percentage_change > 0) ? "positive" : (@data.Data.eth_dominance_24h_percentage_change < 0) ? "negative" : "neutral")"> @data.Data.eth_dominance_24h_percentage_change.ToString("N2")%</p>
+                </li>
+            </ul>
+        </div>
+    </div>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -20,13 +77,19 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Currency" asp-action="CryptoCurrencies">Currencies</a>
+                        <li class="nav-item dropdown" id="currenciesDropdown">
+                            <a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                                Currencies
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="currenciesDropdown">
+                                <a class="dropdown-item" asp-area="" asp-controller="Currency" asp-action="CryptoCurrencies">Currencies</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Currency" asp-action="CryptoCategories">Categories</a>
+                                <a class="dropdown-item" href="#">Category 3</a>
+                            </div>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Currency" asp-action="CryptoExchanges">Exchanges</a>
                         </li>
-                        
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -45,49 +108,43 @@
             &copy; 2023 - Coursework2 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+    <style>
+        #currenciesDropdown .dropdown-menu {
+            display: none;
+        }
+
+        /* Show the dropdown when hovering over "Currencies" */
+        #currenciesDropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .globaldata {
+            display: flex;
+            margin-right: 20px; /* Встановлюємо відступ з права */
+        }
+        .globaldatatext {
+            font-weight: bold; /* Робимо текст жирним */
+            color:blue;
+            margin-right: 5px;
+        }
+    </style>
+
     <script>
-        document.getElementById("fiatDropdown").addEventListener("change", function () {
-            var selectedFiatId = this.value;
-            // Виконати AJAX-запит на сервер для отримання даних за вибраною валютою
-            $.ajax({
-                type: "GET",
-                url: "/Charts/GetSelectedFiats?fiatId=" + selectedFiatId,
-                success: function (data) {
-                    // Оновіть таблицю даними, які отримані з сервера
-                    var tableBody = document.querySelector("#cryptoTable tbody");
-                    tableBody.innerHTML = data;
-                },
-                error: function () {
-                    alert("Помилка при завантаженні даних.");
-                }
-            });
+        // Get the "Currencies" link and its dropdown menu
+        var currenciesLink = document.getElementById("currenciesDropdown");
+        var currenciesDropdownMenu = currenciesLink.querySelector(".dropdown-menu");
+
+        // Add a hover event listener to the "Currencies" link
+        currenciesLink.addEventListener("mouseenter", function () {
+            currenciesDropdownMenu.style.display = "block";
+        });
+
+        // Add a mouseleave event listener to hide the dropdown when the mouse leaves
+        currenciesLink.addEventListener("mouseleave", function () {
+            currenciesDropdownMenu.style.display = "none";
         });
     </script>
-  @*   <script>
-        $(document).ready(function () {
-            populateFiatDropdown();
-        });
 
-        function populateFiatDropdown() {
-            $.ajax({
-                url: '/Charts/GetFiats',
-                type: 'POST',
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    var dropdown = $('#fiatDropdown');
-                    dropdown.find('option').remove(); // Очищення списку
-
-                    $.each(data.Data, function (index, item) {
-                        dropdown.append($('<option>', { value: item.Id, text: item.Symbol }));
-                    });
-                },
-                error: function () {
-                    // Обробка помилки, якщо її відправлення на сервер
-                }
-            });
-        }
-    </script> *@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

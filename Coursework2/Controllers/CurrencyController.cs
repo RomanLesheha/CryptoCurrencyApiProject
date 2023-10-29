@@ -17,19 +17,32 @@ namespace Coursework2.Controllers
             _parseFunctional = parseFunctional;
             _marketCapFunctional = marketCapFunctional;
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
+
         [HttpGet]
         public async Task<IActionResult> CryptoCurrencyDetails(int CurrencyID)
         {
             var result = await _marketCapFunctional.GetCoinMarketCapMetaDataAsync(CurrencyID);
             return View(result);
         }
-        public IActionResult CryptoCategories()
+        public async Task<IActionResult> CryptoCategories()
         {
-            return View();
+            try
+            {
+                var result = await _marketCapFunctional.GetCryptoCurrencyCategoryListAsync();
+                var sortedlist = result.SortByAvgPriceChange();
+                return View(sortedlist);
+            }
+            catch (Exception ex)
+            {
+                var errorModel = new ErrorViewModel
+                {
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                    ErrorMessage = ex.Message,
+                    ExceptionDetails = ex.ToString(), // Деталі Exception
+                    StackTrace = ex.StackTrace
+                };
+                return View("Error", errorModel);
+            }
         }
         public async Task<IActionResult> CryptoCurrencies()
         {
