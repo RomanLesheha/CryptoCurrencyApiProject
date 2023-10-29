@@ -1,12 +1,12 @@
 {
   "dependencies": {
-    "mssql1": {
-      "type": "mssql.local",
-      "connectionId": "ConnectionStrings:ApplicationDbContextConnection"
-    },
     "mssql2": {
       "type": "mssql.local",
       "connectionId": "ConnectionStrings:DataBaseDbContextConnection"
+    },
+    "mssql1": {
+      "type": "mssql.local",
+      "connectionId": "ConnectionStrings:ApplicationDbContextConnection"
     }
   }
 }

@@ -1,4 +1,4 @@
-﻿using Coursework2.Data.Coursework2;
+﻿
 using Coursework2.Interfaces;
 using Coursework2.Models;
 using Microsoft.AspNetCore.Http;
@@ -11,13 +11,11 @@ namespace Coursework2.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly DataBaseDbContext _dbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<IdentityUser> _userManager;
-        public HomeController(ILogger<HomeController> logger , DataBaseDbContext context , IHttpContextAccessor http , UserManager<IdentityUser> user )
+        public HomeController(ILogger<HomeController> logger , IHttpContextAccessor http , UserManager<IdentityUser> user )
         {
             _logger = logger;
-            _dbContext = context;
             _httpContextAccessor = http;
             _userManager = user;
         }
