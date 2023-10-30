@@ -2,6 +2,7 @@
 @inject ICoinMarketCapFunctional _marketfunctional;
 @{
     var data = await _marketfunctional.GetGlobalMetricsAsync();
+   
     string FormatNumber(double number)
     {
         if (number >= 1e12)

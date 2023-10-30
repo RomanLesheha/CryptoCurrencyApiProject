@@ -187,6 +187,10 @@ td.fixed-column, th.fixed-column {
     left: 0;
     background-color: #fff; /* Додайте цю лінію */
 }
+td a{
+    text-decoration:none;
+    font-weight:600;
+}
 
 .positive {
     color: green; /* Колір для додатніх значень */
@@ -210,10 +214,17 @@ td.fixed-column, th.fixed-column {
     padding: 10px;
     white-space: nowrap;
     margin-right: 10px;
+    display: flex;
+    align-items: center; 
     cursor: pointer;
     transition: background-color ease-in-out 0.5s; /* Add a smooth transition effect */
     border-radius:10px;
 }
+    .crypto-button .icon {
+        width: 15px;
+        height: 15px;
+        margin-right: 5px; /* Додатковий відступ від картинки до тексту */
+    }
 
     .crypto-button:hover {
         background-color: #bfbfbf; /* Change the background color when hovering */
@@ -231,6 +242,7 @@ td.fixed-column, th.fixed-column {
     .crypto-button-container {
         flex-wrap: nowrap; /* Prevent wrapping on smaller screens */
     }
+
 }
 /* Додаткові стилі для телефонного розміру екрану */
 @media (max-width: 992px) {
@@ -248,5 +260,5 @@ td.fixed-column, th.fixed-column {
     }
     .modal-content {
         width: 90%;
-    } 
+    }
 }

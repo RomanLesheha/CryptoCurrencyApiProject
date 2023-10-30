@@ -20,6 +20,32 @@
         string formattedPriceString = $"${formattedPrice:#,0.00}";
         return formattedPriceString;
     }
+    var data = await _service.GetGlobalMetricsAsync();
+    
+    string FormatNumber(double number)
+    {
+        if (number >= 1e12)
+        {
+            double trillions = number / 1e12;
+            return $"{trillions:F1}T+";
+        }
+        if (number >= 1e9)
+        {
+            double billions = number / 1e9;
+            return $"{billions:F1}B+";
+        }
+        if (number >= 1e6)
+        {
+            double millions = number / 1e6;
+            return $"{millions:F1}M+";
+        }
+        if (number >= 1e3)
+        {
+            double thousands = number / 1e3;
+            return $"{thousands:F1}K+";
+        }
+        return $"{number:F1}+";
+    }
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -31,13 +57,29 @@
 </head>
 <body>
     <div class="container align-content-center justify-content-center">
-        <button id="openModalButton">Select Currency</button>
-        <button id="openModal2Button">Filters</button>
+
+        <div>
+            <h3>
+                Today's Cryptocurrency Prices by Market Cap
+            </h3>
+        </div>
+
         <div class="crypto-button-container">
-            <span class="crypto-button" data-tags="bitcoin-ecosystem">🔥Bitcoin Ecosystem</span>
-            <span class="crypto-button" data-tags="ftx-bankruptcy-estate">🔥FTX Bankruptcy Estate</span>
-            <span class="crypto-button" data-tags="real-world-assets">🔥Real World Assets</span>
-            <span class="crypto-button" data-tags="telegram-bot">🔥Telegram Bot</span>
+            <span class="crypto-button" id="openModalButton">
+                <img src="~/Image/finish.png" alt="Finish" class="icon" />
+                Select Currency
+            </span>
+            <span class="crypto-button" id="openModal2Button">
+                <img src="~/Image/filter.png" alt="Filter" class="icon" />
+                Filters
+            </span>
+        </div>
+       
+        <div class="crypto-button-container">
+            <span class="crypto-button crypto-func" data-tags="bitcoin-ecosystem">🔥Bitcoin Ecosystem</span>
+            <span class="crypto-button crypto-func" data-tags="ftx-bankruptcy-estate">🔥FTX Bankruptcy Estate</span>
+            <span class="crypto-button crypto-func" data-tags="real-world-assets">🔥Real World Assets</span>
+            <span class="crypto-button crypto-func" data-tags="telegram-bot">🔥Telegram Bot</span>
         </div>
         <!-- Модальне вікно -->
         <div id="myModal" class="modal">
@@ -280,13 +322,12 @@
 
     // Об'єкт для зберігання параметрів
     var queryParams = {};
-    var selectedSign;
+    var selectedSign = "$";
 
     function updateTablePeriodically() {
         // Call the updateTable function here with your data and selectedFiatSign
         // Replace the following example data and selectedFiatSign with your actual data and sign
-        if (selectedSign == null)
-            selectedSign = "$"
+        
 
         $.ajax({
             type: "POST",
@@ -305,7 +346,7 @@
     updateTablePeriodically();
 
     // Set an interval to call the function 
-    setInterval(updateTablePeriodically, 60000);
+    setInterval(updateTablePeriodically, 30000);
 
     var radioButtons = document.querySelectorAll('input[name="cryptocurrency_type"]');
     for (var i = 0; i < radioButtons.length; i++) {
@@ -407,14 +448,15 @@
 
     });
 
-    var cryptoButtons = document.querySelectorAll(".crypto-button");
+    var cryptoButtons = document.querySelectorAll(".crypto-func");
 
     // Додаємо обробник подій для кожної кнопки
     cryptoButtons.forEach(function (button) {
         button.addEventListener("click", function () {
             // Отримуємо значення параметру tags з атрибуту data
             var tags = button.getAttribute("data-tags");
-
+             if (selectedSign == null)
+            selectedSign = "$"
             // Виконуємо AJAX-запит і передаємо параметр tags
             $.ajax({
                 type: "POST",
