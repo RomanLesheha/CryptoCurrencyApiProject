@@ -176,6 +176,7 @@ td {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    vertical-align: middle;
 }
 
 tr:hover {
@@ -260,5 +261,45 @@ td a{
     }
     .modal-content {
         width: 90%;
+    }
+}
+
+
+/*//INDEX*/
+
+.crypto-list {
+    display: grid;
+    gap: 10px;
+    width:100%;
+    grid-template-columns: repeat(auto-fill, minmax(30%, 3fr));
+}
+
+.crypto-table {
+    background-color: rgb(240, 240, 240);
+    border-radius: 30px;
+    padding: 15px;
+    overflow:auto;
+
+}
+.name-column {
+    width: 50%; /* Задайте бажану ширину */
+    overflow: hidden;
+    vertical-align: central;
+}
+
+
+.right-align {
+    text-align: right;
+}
+
+@media (max-width: 768px) {
+    .crypto-list {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 2fr)); /* Змінюємо кількість стовпців для телефону */
+    }
+}
+/* Медіа-запит для розмірів екрану менше 1024px (планшетна версія, 2 елементи в рядку) */
+@media (max-width: 992px) {
+    .crypto-list {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 2fr)); /* Змінюємо кількість стовпців для телефону */
     }
 }

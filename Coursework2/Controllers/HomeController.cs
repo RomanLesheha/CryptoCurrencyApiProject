@@ -22,8 +22,6 @@ namespace Coursework2.Controllers
 
         public IActionResult Index()
         {
-            var a = GetUserId();
-            ViewBag.Id = a;
             return View();
         }
 

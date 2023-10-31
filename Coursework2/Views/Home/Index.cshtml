@@ -1,12 +1,125 @@
-﻿@{
+﻿@using Coursework2.Interfaces
+@inject ICoinMarketCapFunctional _service;
+@{
     ViewData["Title"] = "Home Page";
-}
-@if (ViewBag.Id != null)
-{
-    <h1>@ViewBag.Id</h1>
+    var data = await _service.GetCryptoCurrenciesListMetaAsync(null);
+    var sortedDataTrending = data.data.OrderByDescending(d => d.quote.First().Value.percent_change_24h).Take(5).ToList();
+
+    var sortedDataVolume = data.data.OrderByDescending(d => d.quote.First().Value.volume_change_24h).Take(5).ToList();
+
+    var sortedDataLosers = data.data.OrderBy(d => d.quote.First().Value.percent_change_24h).Take(5).ToList();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div>
+        <h3>The Best Cryptos Based On The Latest Data</h3>
+        <h5>Our cryptocurrencies to watch lists are based on the latest price and user behavior data.</h5>
+
+        <div class="crypto-list">
+            <div class="crypto-table">
+                <h5>Trending</h5>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th class="right-align">Price</th>
+                                <th class="right-align">24h</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var i = 0; i < sortedDataTrending.Count; i++)
+                            {
+                                var item = sortedDataTrending[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td class="name-column">
+                                        <img style="max-height:20px; max-width:20px;" src="@item.urlLogo" />
+                                        <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@item.id">@item.name</a>
+                                    </td>
+                                    <td class="right-align">$@item.quote.First().Value.price.ToString("N6")</td>
+                                    <td class="right-align @((item.quote.First().Value.percent_change_24h > 0) ? "positive" : (item.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
+                                        @item.quote.First().Value.volume_change_24h.ToString("N2")%
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="crypto-table">
+                <h5>Volume Change</h5>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th class="right-align">Price</th>
+                                <th class="right-align">24h</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var i = 0; i < sortedDataVolume.Count; i++)
+                            {
+                                var item = sortedDataVolume[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td class="name-column">
+                                        <img style="max-height:20px; max-width:20px;" src="@item.urlLogo" />
+                                        <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@item.id">@item.name</a>
+                                    </td>
+                                    <td class="right-align">$@item.quote.First().Value.price.ToString("N6")</td>
+                                    <td class="right-align @((item.quote.First().Value.percent_change_24h > 0) ? "positive" : (item.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
+                                        @item.quote.First().Value.volume_change_24h.ToString("N2")%
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="crypto-table">
+                <h5>Biggest Losers</h5>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th class="right-align">Price</th>
+                                <th class="right-align">24h</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var i = 0; i < sortedDataLosers.Count; i++)
+                            {
+                                var item = sortedDataLosers[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td class="name-column">
+                                        <img style="max-height:20px; max-width:20px;" src="@item.urlLogo" />
+                                        <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@item.id">@item.name</a>
+                                    </td>
+                                    <td class="right-align">$@item.quote.First().Value.price.ToString("N6")</td>
+                                    <td class="right-align @((item.quote.First().Value.percent_change_24h > 0) ? "positive" : (item.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
+                                        @item.quote.First().Value.percent_change_24h.ToString("N2")%
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+

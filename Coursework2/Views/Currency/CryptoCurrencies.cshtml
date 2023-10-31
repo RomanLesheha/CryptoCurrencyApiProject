@@ -207,7 +207,10 @@
                         <tr data-id="@crypto.id" class="table-row">
                             <td class="fixed-column"><span class="star" id="addtofavouritebtn" data-id="@crypto.id">☆</span></td>
                             <td class="fixed-column">@crypto.cmc_rank</td>
-                            <td class="fixed-column"><img style="max-height:20px;max-width:20px;" src="@crypto.urlLogo" /> <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.name  @crypto.symbol</a></td>
+                            <td class="fixed-column">
+                                <img style="max-height:20px;max-width:20px;" src="@crypto.urlLogo" /> 
+                                <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.name  @crypto.symbol</a>
+                            </td>
                             <td>@crypto.quote.First().Value.price.ToString("N6")$</td>
                             <td class="@((crypto.quote.First().Value.percent_change_1h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_1h < 0) ? "negative" : "neutral")">
                                 @crypto.quote.First().Value.percent_change_1h.ToString("N2")%
@@ -219,7 +222,9 @@
                                 @crypto.quote.First().Value.percent_change_7d.ToString("N2")%
                             </td>
                             <td style=" color: blue;">@string.Format(cultureInfo, "{0:C0}", @crypto.quote.First().Value.market_cap)</td>
-                            <td>@string.Format("{0:#,0}",@Math.Round(crypto.circulating_supply)) @crypto.symbol</td>
+                            <td>
+                                @string.Format("{0:#,0}",@Math.Round(crypto.circulating_supply)) @crypto.symbol <br>
+                            </td>
                             <td>@string.Format("${0:#,0}", crypto.quote.First().Value.volume_24h)</td>
 
                         </tr>
@@ -325,10 +330,6 @@
     var selectedSign = "$";
 
     function updateTablePeriodically() {
-        // Call the updateTable function here with your data and selectedFiatSign
-        // Replace the following example data and selectedFiatSign with your actual data and sign
-        
-
         $.ajax({
             type: "POST",
             contentType: "application/json; charset=utf-8",
