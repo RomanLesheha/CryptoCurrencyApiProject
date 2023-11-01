@@ -2,6 +2,7 @@
 @using Coursework2.Interfaces;
 @using System.Globalization;
 @inject ICoinMarketCapFunctional _service;
+
 @{
     CultureInfo cultureInfo = new CultureInfo("en-US");
     string formatstring(double price)
@@ -207,9 +208,13 @@
                         <tr data-id="@crypto.id" class="table-row">
                             <td class="fixed-column"><span class="star" id="addtofavouritebtn" data-id="@crypto.id">☆</span></td>
                             <td class="fixed-column">@crypto.cmc_rank</td>
-                            <td class="fixed-column">
-                                <img style="max-height:20px;max-width:20px;" src="@crypto.urlLogo" /> 
-                                <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.name  @crypto.symbol</a>
+                            <td class="fixed-column name_td_wrap">
+                                <img class="currLogo" src="@crypto.urlLogo" />
+                                <div class="name_td">
+                                    <a style="margin-right:2%;" asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.name </a>
+                                    <a style="margin-right:2%;" asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.symbol </a>
+                                </div>
+                                
                             </td>
                             <td>@crypto.quote.First().Value.price.ToString("N6")$</td>
                             <td class="@((crypto.quote.First().Value.percent_change_1h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_1h < 0) ? "negative" : "neutral")">
@@ -344,10 +349,10 @@
             }
         });
     }
-    updateTablePeriodically();
+    // updateTablePeriodically();
 
-    // Set an interval to call the function 
-    setInterval(updateTablePeriodically, 30000);
+    // // Set an interval to call the function 
+    // setInterval(updateTablePeriodically, 30000);
 
     var radioButtons = document.querySelectorAll('input[name="cryptocurrency_type"]');
     for (var i = 0; i < radioButtons.length; i++) {

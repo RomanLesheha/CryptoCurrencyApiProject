@@ -257,7 +257,14 @@ namespace Coursework2.Realizations
                 };
 
                 var response = await _apiParser.GetApiParser(ApiServiceFactory.ApiParserType.CoinMarketCap).ParseAsync<CryptoCurrencyCategoryList>(_keyFactory.BuildUrl(endpoint, queryParams));
+                
+                
+                var globaldata = await GetGlobalMetricsAsync();
+
+                response.data.ForEach(x => x.dominance = (x.market_cap / globaldata.Data.Quote.First().Value.total_market_cap ) * 100);
+                
                 return response;
+
             }
             catch (Exception ex)
             {
@@ -265,22 +272,33 @@ namespace Coursework2.Realizations
             }
         }
 
-        public async Task<CryptoCurrencyCategoryMetaData> GetCryptoCurrencyCategoryMetaDataAsync(int CategoryID)
+        public async Task<CryptoCurrencyCategoryMetaData> GetCryptoCurrencyCategoryMetaDataAsync(string CategoryID)
         {
             string apiKey = await _keyFactory.GetNextValidAPIKeyAsync();
 
             try
             {
                 var listExchanges = await GetCryptoCurrencyCategoryListAsync();
-                var ids = listExchanges.data.Select(p => p.id).Take(2).ToList();
-                string endpoint = $"v1/cryptocurrency/category?id={string.Join(",", ids)}";
+                string endpoint = $"v1/cryptocurrency/category?id={CategoryID}";
                 var queryParams = new Dictionary<string, object>
                 {
-
                 }; 
 
                 var response = await _apiParser.GetApiParser(ApiServiceFactory.ApiParserType.CoinMarketCap).ParseAsync<CryptoCurrencyCategoryMetaData>(_keyFactory.BuildUrl(endpoint, queryParams));
+                
+                var ids = response.data.coins.Select(x => x.id).ToList();
+                var metadata = await GetCoinMarketCapMetaDataAsync(ids);
+
+                foreach (var dataItem in response.data.coins)
+                {
+                    if (metadata.TryGetValue(dataItem.id, out var coinMetaData))
+                    {
+                        dataItem.urlLogo = coinMetaData.LogoUrl;
+                    }
+                }
+
                 return response;
+
             }
             catch (Exception ex)
             {

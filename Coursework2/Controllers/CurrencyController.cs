@@ -24,6 +24,14 @@ namespace Coursework2.Controllers
             var result = await _marketCapFunctional.GetCoinMarketCapMetaDataAsync(CurrencyID);
             return View(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> CryptoCategoryDetails(string CategoryID)
+        {
+            var result = await _marketCapFunctional.GetCryptoCurrencyCategoryMetaDataAsync(CategoryID);
+            return View(result);
+        }
+        [Route("Cryptocategories")]
         public async Task<IActionResult> CryptoCategories()
         {
             try
@@ -44,6 +52,7 @@ namespace Coursework2.Controllers
                 return View("Error", errorModel);
             }
         }
+        [Route("Cryptocurrencies")]
         public async Task<IActionResult> CryptoCurrencies()
         {
             try

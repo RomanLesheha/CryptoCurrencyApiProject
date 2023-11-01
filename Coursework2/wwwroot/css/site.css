@@ -192,15 +192,43 @@ td a{
     text-decoration:none;
     font-weight:600;
 }
-
+.name_td_wrap{
+    display:flex;
+    vertical-align:central;
+    align-content:center;
+    align-items:center;
+    justify-content:start;
+}
+.currLogo{
+    max-width:25px;
+    max-height:25px;
+    margin-right:5%;
+}
+.name_td {
+    display: flex;
+    vertical-align: central;
+    align-content: center;
+    align-items: center;
+    justify-content: start;
+}
 .positive {
     color: green; /* Колір для додатніх значень */
 }
-
+    .positive::before {
+        content: "▲";
+        font-size:10px;
+        vertical-align:central;
+    }
 
 .negative {
     color: red; /* Колір для від'ємних значень */
 }
+
+    .negative::before {
+        font-size: 10px;
+        content: "▼";
+        vertical-align: central;
+    }
 
 .neutral {
     color: blue; /* Колір для нейтральних значень */
@@ -228,8 +256,12 @@ td a{
     }
 
     .crypto-button:hover {
-        background-color: #bfbfbf; /* Change the background color when hovering */
+        background-color: rgb(245, 245, 245); /* Change the background color when hovering */
+        box-shadow: 48px 5px 58px -21px rgba(0,0,0,0.66);
+        -webkit-box-shadow: 48px 5px 58px -21px rgba(0,0,0,0.66);
+        -moz-box-shadow: 48px 5px 58px -21px rgba(0,0,0,0.66);
     }
+
 
 /* Hide scrollbar in webkit-based browsers */
 .crypto-button-container::-webkit-scrollbar {
@@ -262,44 +294,93 @@ td a{
     .modal-content {
         width: 90%;
     }
+    .name_td{
+        display:grid;
+    }
+    .currLogo {
+       max-width:35px;
+       max-height:35px;
+    }
+    
 }
 
 
 /*//INDEX*/
-
 .crypto-list {
-    display: grid;
-    gap: 10px;
-    width:100%;
-    grid-template-columns: repeat(auto-fill, minmax(30%, 3fr));
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    margin-top:5%;
+    margin-bottom:5%;
 }
 
 .crypto-table {
-    background-color: rgb(240, 240, 240);
+    background-color: rgb(245, 245, 245);
     border-radius: 30px;
     padding: 15px;
-    overflow:auto;
-
+    width: 40%;
+    margin-bottom: 5%;
+    box-shadow: 9px 46px 94px -6px rgba(0,0,0,0.57);
+    -webkit-box-shadow: 9px 46px 94px -6px rgba(0,0,0,0.57);
+    -moz-box-shadow: 9px 46px 94px -6px rgba(0,0,0,0.57);
 }
+
 .name-column {
-    width: 50%; /* Задайте бажану ширину */
+    width: 50%;
     overflow: hidden;
     vertical-align: central;
 }
-
 
 .right-align {
     text-align: right;
 }
 
-@media (max-width: 768px) {
-    .crypto-list {
-        grid-template-columns: repeat(auto-fill, minmax(350px, 2fr)); /* Змінюємо кількість стовпців для телефону */
+.percent-change {
+    display: table-cell; /* Початково сховати поле 24h */
+}
+.crypto-table_head{
+    display:flex;
+    justify-content:space-between;
+    vertical-align:central;
+}
+.crypto-table_head a{
+    text-decoration:none;
+}
+
+@media (max-width: 992px) {
+    .crypto-table {
+        width: 45%;
+    }
+
+    .percent-change {
+        display:none; /* Вмикнути поле 24h на медіа-запиті 992px та менше */
     }
 }
-/* Медіа-запит для розмірів екрану менше 1024px (планшетна версія, 2 елементи в рядку) */
-@media (max-width: 992px) {
+@media (max-width: 778px) {
     .crypto-list {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 2fr)); /* Змінюємо кількість стовпців для телефону */
+        display: block;
+        text-align: center; /* Горизонтальне відцентрування */
+    }
+    .crypto-table {
+        width: 90%;
+        margin: 0 auto; /* Горизонтальне відцентрування */
+        display: flex;
+        flex-direction: column;
+        margin-bottom:5%;
+    }
+
+    .percent-change {
+        display: table-cell; /* Вмикнути поле 24h на медіа-запиті 992px та менше */
+    }
+}
+
+@media (max-width: 448px) {
+
+    .crypto-table {
+        width: 100%;
+    }
+
+    .percent-change {
+        display: none; /* Вмикнути поле 24h на медіа-запиті 992px та менше */
     }
 }

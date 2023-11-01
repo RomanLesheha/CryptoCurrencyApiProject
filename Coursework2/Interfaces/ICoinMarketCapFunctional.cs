@@ -18,7 +18,7 @@ namespace Coursework2.Interfaces
         Task<ExchangeMetaData> GetExchangeMetaDataAsync();
 
         Task<CryptoCurrencyCategoryList> GetCryptoCurrencyCategoryListAsync();
-        Task<CryptoCurrencyCategoryMetaData> GetCryptoCurrencyCategoryMetaDataAsync(int CategoryID);
+        Task<CryptoCurrencyCategoryMetaData> GetCryptoCurrencyCategoryMetaDataAsync(string CategoryID);
 
         Task<CryptoGlobalMetricsData> GetGlobalMetricsAsync();
 

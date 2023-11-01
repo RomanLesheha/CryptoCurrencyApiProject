@@ -5,9 +5,38 @@
     var data = await _service.GetCryptoCurrenciesListMetaAsync(null);
     var sortedDataTrending = data.data.OrderByDescending(d => d.quote.First().Value.percent_change_24h).Take(5).ToList();
 
-    var sortedDataVolume = data.data.OrderByDescending(d => d.quote.First().Value.volume_change_24h).Take(5).ToList();
-
+    var globalData = await _service.GetGlobalMetricsAsync();
     var sortedDataLosers = data.data.OrderBy(d => d.quote.First().Value.percent_change_24h).Take(5).ToList();
+
+    var totalvolumeDefiPercent = globalData.Data.Quote.First().Value.defi_volume_24h / globalData.Data.Quote.First().Value.total_volume_24h * 100;
+
+    var totalvolumeStableCoinspercent = globalData.Data.Quote.First().Value.stablecoin_volume_24h / globalData.Data.Quote.First().Value.total_volume_24h * 100;
+
+
+    string FormatNumber(double number)
+    {
+        if (number >= 1e12)
+        {
+            double trillions = number / 1e12;
+            return $"{trillions:F1}T+";
+        }
+        if (number >= 1e9)
+        {
+            double billions = number / 1e9;
+            return $"{billions:F1}B+";
+        }
+        if (number >= 1e6)
+        {
+            double millions = number / 1e6;
+            return $"{millions:F1}M+";
+        }
+        if (number >= 1e3)
+        {
+            double thousands = number / 1e3;
+            return $"{thousands:F1}K+";
+        }
+        return $"{number:F1}+";
+    }
 }
 
 <head>
@@ -20,17 +49,26 @@
     <div>
         <h3>The Best Cryptos Based On The Latest Data</h3>
         <h5>Our cryptocurrencies to watch lists are based on the latest price and user behavior data.</h5>
-
+        <div>
+            The global crypto market cap is  <span class="globaldatatext">$@FormatNumber(@globalData.Data.Quote.First().Value.total_market_cap)</span>,a <span class="@((@globalData.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change > 0) ? "positive" : (@globalData.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change < 0) ? "negative" : "neutral")"> @globalData.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change.ToString("N2")%</span> change over last day.
+            The total crypto market volume over the last 24 hours is <span class="globaldatatext">$@FormatNumber(@globalData.Data.Quote.First().Value.total_volume_24h)</span>, which makes a <span class="@((@globalData.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change > 0) ? "positive" : (@globalData.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change < 0) ? "negative" : "neutral")"> @globalData.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change.ToString("N2")%</span> changes.
+            The total volume in DeFi is currently  <span class="globaldatatext">$@FormatNumber(@globalData.Data.Quote.First().Value.defi_volume_24h)</span>,<span >@totalvolumeDefiPercent.ToString("N2")%</span> of the total crypto market 24-hour volume.
+            The volume of all stable coins is now  <span class="globaldatatext">$@FormatNumber(@globalData.Data.Quote.First().Value.stablecoin_volume_24h)</span>,<span>@totalvolumeStableCoinspercent.ToString("N2")%</span>  which is of the total crypto market 24-hour volume.
+            Bitcoin’s dominance is currently <span class="globaldatatext">@globalData.Data.btc_dominance.ToString("N2")%</span>, a change of <span class="@((@globalData.Data.btc_dominance_24h_percentage_change > 0) ? "positive" : (@globalData.Data.btc_dominance_24h_percentage_change < 0) ? "negative" : "neutral")"> @globalData.Data.btc_dominance_24h_percentage_change.ToString("N2")%</span> over the day.
+        </div>
         <div class="crypto-list">
             <div class="crypto-table">
-                <h5>Trending</h5>
+                <div class="crypto-table_head">
+                    <h5>📈Biggest Gainers</h5>
+                    <a asp-area="" asp-controller="Currency" asp-action="CryptoCurrencies">See more></a>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
-                                <th class="right-align">Price</th>
+                                <th class="right-align percent-change">Price</th>
                                 <th class="right-align">24h</th>
                             </tr>
                         </thead>
@@ -44,41 +82,9 @@
                                         <img style="max-height:20px; max-width:20px;" src="@item.urlLogo" />
                                         <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@item.id">@item.name</a>
                                     </td>
-                                    <td class="right-align">$@item.quote.First().Value.price.ToString("N6")</td>
+                                    <td class="right-align percent-change">$@item.quote.First().Value.price.ToString("N6")</td>
                                     <td class="right-align @((item.quote.First().Value.percent_change_24h > 0) ? "positive" : (item.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
-                                        @item.quote.First().Value.volume_change_24h.ToString("N2")%
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="crypto-table">
-                <h5>Volume Change</h5>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th class="right-align">Price</th>
-                                <th class="right-align">24h</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (var i = 0; i < sortedDataVolume.Count; i++)
-                            {
-                                var item = sortedDataVolume[i];
-                                <tr>
-                                    <td>@(i + 1)</td>
-                                    <td class="name-column">
-                                        <img style="max-height:20px; max-width:20px;" src="@item.urlLogo" />
-                                        <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@item.id">@item.name</a>
-                                    </td>
-                                    <td class="right-align">$@item.quote.First().Value.price.ToString("N6")</td>
-                                    <td class="right-align @((item.quote.First().Value.percent_change_24h > 0) ? "positive" : (item.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
-                                        @item.quote.First().Value.volume_change_24h.ToString("N2")%
+                                        @item.quote.First().Value.percent_change_24h.ToString("N2")%
                                     </td>
                                 </tr>
                             }
@@ -88,14 +94,17 @@
             </div>
 
             <div class="crypto-table">
-                <h5>Biggest Losers</h5>
+                <div class="crypto-table_head">
+                    <h5>📉Biggest Losers</h5>
+                    <a  asp-area="" asp-controller="Currency" asp-action="CryptoCurrencies">See more></a>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
-                                <th class="right-align">Price</th>
+                                <th class="right-align percent-change">Price</th>
                                 <th class="right-align">24h</th>
                             </tr>
                         </thead>
@@ -109,7 +118,7 @@
                                         <img style="max-height:20px; max-width:20px;" src="@item.urlLogo" />
                                         <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@item.id">@item.name</a>
                                     </td>
-                                    <td class="right-align">$@item.quote.First().Value.price.ToString("N6")</td>
+                                    <td class="right-align percent-change">$@item.quote.First().Value.price.ToString("N6")</td>
                                     <td class="right-align @((item.quote.First().Value.percent_change_24h > 0) ? "positive" : (item.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
                                         @item.quote.First().Value.percent_change_24h.ToString("N2")%
                                     </td>

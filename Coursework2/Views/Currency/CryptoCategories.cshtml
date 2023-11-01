@@ -26,6 +26,7 @@
                     <th>Number of Tokens</th>
                     <th>Avg.Price Change</th>
                     <th>Market Cap</th>
+                    <th>Dominance</th>
                     <th>Volume(24h)</th>
 
 
@@ -33,26 +34,29 @@
             </thead>
             <!-- Тіло таблиці -->
             <tbody id="cryptoTableBody">
-                @foreach (var crypto in Model.data)
+                @foreach (var category in Model.data)
                 {
-                    <tr data-id="@crypto.id" class="table-row">
+                    <tr data-id="@category.id" class="table-row">
                         <td class="row-number"></td>
-                        <td class="fixed-column"><b>@crypto.name</b></td>
-                        <td>@crypto.num_tokens</td>
-                        <td class="@((crypto.avg_price_change > 0) ? "positive" : (crypto.avg_price_change < 0) ? "negative" : "neutral")">
-                            @if (crypto.avg_price_change.HasValue)
-                                @crypto.avg_price_change.Value.ToString("N2")
+                        <td class="fixed-column"><a asp-action="CryptoCategoryDetails" asp-controller="Currency" asp-route-CategoryID="@category.id">@category.name</a></td>
+                        <td>@category.num_tokens</td>
+                        <td class="@((category.avg_price_change > 0) ? "positive" : (category.avg_price_change < 0) ? "negative" : "neutral")">
+                            @if (category.avg_price_change.HasValue)
+                                @category.avg_price_change.Value.ToString("N2")%
                         </td>
                             <td style=" color: blue;">
-                                @string.Format(cultureInfo, "{0:C0}", @crypto.market_cap) <br /> <p class="@((crypto.market_cap_change > 0) ? "positive" : (crypto.market_cap_change < 0) ? "negative" : "neutral")">
-                                    @if (crypto.market_cap_change.HasValue)
-                                        @crypto.market_cap_change.Value.ToString("N2")%
+                                @string.Format(cultureInfo, "{0:C0}", category.market_cap) <br /> <p class="@((category.market_cap_change > 0) ? "positive" : (category.market_cap_change < 0) ? "negative" : "neutral")">
+                                    @if (category.market_cap_change.HasValue)
+                                        @category.market_cap_change.Value.ToString("N2")%
                                 </p>
                             </td>
+                            <th>
+                                @category.dominance.ToString("N2")%
+                            </th>
                             <td>
-                                @string.Format(cultureInfo,"{0:C0}",@Math.Round(crypto.volume))<br /> <p class="@((crypto.volume_change > 0) ? "positive" : (crypto.volume_change < 0) ? "negative" : "neutral")">
-                                    @if (crypto.volume_change.HasValue)
-                                        @crypto.volume_change.Value.ToString("N2")%
+                                @string.Format(cultureInfo,"{0:C0}",@Math.Round(category.volume))<br /> <p class="@((category.volume_change > 0) ? "positive" : (category.volume_change < 0) ? "negative" : "neutral")">
+                                    @if (category.volume_change.HasValue)
+                                        @category.volume_change.Value.ToString("N2")%
                                 </p>
                             </td>
                     </tr>

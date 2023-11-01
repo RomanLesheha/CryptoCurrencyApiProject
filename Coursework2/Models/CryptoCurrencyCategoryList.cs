@@ -15,6 +15,8 @@
 
         public double? volume_change { get; set; }
 
+        public double dominance { get; set; }
+
         public DateTime last_updated { get; set; }
     }
 

@@ -1,0 +1,78 @@
+﻿@model CryptoCurrencyCategoryMetaData 
+@using Coursework2.Interfaces;
+@using System.Globalization;
+@{
+    CultureInfo cultureInfo = new CultureInfo("en-US");
+}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container">
+        <h3>
+            Top <span class="globaldatatext">@Model.data.name </span> Tokens by Market Capitalization
+        </h3>
+        <h5>
+            Listed below are the top crypto coins and tokens used for Harmony Ecosystem. They are listed in size by market capitalization. To reorder the list, simply click on one of the options - such as 24h or 7d - to see the sector from a different perspective.
+            
+        </h5>
+        
+
+
+        <div class="table-responsive">
+            <table id="cryptoTable" class="table custom-table">
+                <!-- Заголовок таблиці -->
+                <thead>
+                    <tr>
+                        <th class="fixed-column"></th>
+                        <th class="fixed-column">Rank</th>
+                        <th class="fixed-column">Name</th>
+                        <th>Price</th>
+                        <th>% 1h</th>
+                        <th>% 24h</th>
+                        <th>% 7d</th>
+                        <th>Market Cap</th>
+                        <th>Circulating Supply</th>
+                        <th>Volume(24h)</th>
+
+                    </tr>
+                </thead>
+                <!-- Тіло таблиці -->
+                <tbody id="cryptoTableBody">
+                    @foreach (var crypto in Model.data.coins)
+                    {
+                        <tr data-id="@crypto.id" class="table-row">
+                            <td class="fixed-column"><span class="star" id="addtofavouritebtn" data-id="@crypto.id">☆</span></td>
+                            <td class="fixed-column">@crypto.cmc_rank</td>
+                            <td class="fixed-column">
+                                <img style="max-height:20px;max-width:20px;" src="@crypto.urlLogo" />
+                                <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.name  @crypto.symbol</a>
+                            </td>
+                            <td>@crypto.quote.First().Value.price.ToString("N6")$</td>
+                            <td class="@((crypto.quote.First().Value.percent_change_1h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_1h < 0) ? "negative" : "neutral")">
+                                @crypto.quote.First().Value.percent_change_1h.ToString("N2")%
+                            </td>
+                            <td class="@((crypto.quote.First().Value.percent_change_24h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
+                                @crypto.quote.First().Value.percent_change_24h.ToString("N2")%
+                            </td>
+                            <td class="@((crypto.quote.First().Value.percent_change_7d > 0) ? "positive" : (crypto.quote.First().Value.percent_change_7d < 0) ? "negative" : "neutral")">
+                                @crypto.quote.First().Value.percent_change_7d.ToString("N2")%
+                            </td>
+                            <td style=" color: blue;">@string.Format(cultureInfo, "{0:C0}", @crypto.quote.First().Value.market_cap)</td>
+                            <td>
+                                @string.Format("{0:#,0}",@Math.Round(crypto.circulating_supply)) @crypto.symbol <br>
+                            </td>
+                            <td>@string.Format("${0:#,0}", crypto.quote.First().Value.volume_24h)</td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+</body>
+
