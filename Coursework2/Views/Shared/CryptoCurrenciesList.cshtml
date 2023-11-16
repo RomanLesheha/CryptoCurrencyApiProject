@@ -1,0 +1,276 @@
+﻿@model CryptoCurrenciesListMetaData
+@using Coursework2.Interfaces;
+@using Coursework2.Models.CoinMarketCapApiModels;
+@using System.Globalization;
+@inject ICoinMarketCapFunctional _service;
+@inject IUserRealization _user;
+
+@{
+    CultureInfo cultureInfo = new CultureInfo("en-US");
+    string formatstring(double price)
+    {
+        string formattedPrice;
+
+        if (price < 0.01)
+        {
+            formattedPrice = price.ToString("0.########"); // Закруглюємо до 9 знаків після коми
+        }
+        else
+        {
+            formattedPrice = price.ToString("0.00"); // Закруглюємо до 2 знаків після коми
+        }
+
+        string formattedPriceString = $"${formattedPrice:#,0.00}";
+        return formattedPriceString;
+    }
+    var data = await _service.GetGlobalMetricsAsync();
+
+    string FormatNumber(double number)
+    {
+        if (number >= 1e12)
+        {
+            double trillions = number / 1e12;
+            return $"{trillions:F1}T+";
+        }
+        if (number >= 1e9)
+        {
+            double billions = number / 1e9;
+            return $"{billions:F1}B+";
+        }
+        if (number >= 1e6)
+        {
+            double millions = number / 1e6;
+            return $"{millions:F1}M+";
+        }
+        if (number >= 1e3)
+        {
+            double thousands = number / 1e3;
+            return $"{thousands:F1}K+";
+        }
+        return $"{number:F1}+";
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container align-content-center justify-content-center">
+        <div class="table-responsive">
+            <table id="cryptoTable" class="table custom-table">
+                <!-- Заголовок таблиці -->
+                <thead>
+                    <tr>
+                        <th class="fixed-column"></th>
+                        <th class="fixed-column">Rank</th>
+                        <th class="fixed-column">Name</th>
+                        <th>Price</th>
+                        <th>% 1h</th>
+                        <th>% 24h</th>
+                        <th>% 7d</th>
+                        <th>Market Cap</th>
+                        <th>Circulating Supply</th>
+                        <th>Volume(24h)</th>
+
+                    </tr>
+                </thead>
+                <!-- Тіло таблиці -->
+                <tbody id="cryptoTableBody">
+                    @foreach (var crypto in Model.data)
+                    {
+                        <tr data-id="@crypto.id" class="table-row">
+                            <td class="fixed-column">
+                                <span data-id="@crypto.id" id="addtofavouritebtn" data-islogin="@(_user.GetUserId() != null ? _user.GetUserId().ToString() : "null")" class="star @(_user.IsLikedCoinAsync(crypto.id).Result ? "active_star" : "")">
+                                    @(_user.IsLikedCoinAsync(crypto.id).Result ? "★" : "☆")
+                                </span>
+                            </td>
+                            <td class="fixed-column">@crypto.cmc_rank</td>
+                            <td class="fixed-column name_td_wrap">
+                                <img class="currLogo" src="@crypto.urlLogo" />
+                                <div class="name_td">
+                                    <a class="name_td_text" asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.name </a>
+                                    <a style="margin-left:5%;color:grey;" asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.symbol </a>
+                                </div>
+                            </td>
+                            <td>@crypto.quote.First().Value.price.ToString("N6")$</td>
+                            <td class="@((crypto.quote.First().Value.percent_change_1h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_1h < 0) ? "negative" : "neutral")">
+                                @crypto.quote.First().Value.percent_change_1h.ToString("N2")%
+                            </td>
+                            <td class="@((crypto.quote.First().Value.percent_change_24h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
+                                @crypto.quote.First().Value.percent_change_24h.ToString("N2")%
+                            </td>
+                            <td class="@((crypto.quote.First().Value.percent_change_7d > 0) ? "positive" : (crypto.quote.First().Value.percent_change_7d < 0) ? "negative" : "neutral")">
+                                @crypto.quote.First().Value.percent_change_7d.ToString("N2")%
+                            </td>
+                            <td style=" color: blue;">@string.Format(cultureInfo, "{0:C0}", @crypto.quote.First().Value.market_cap)</td>
+                            <td>
+                                @string.Format("{0:#,0}",@Math.Round(crypto.circulating_supply)) @crypto.symbol <br>
+                            </td>
+                            <td>@string.Format("${0:#,0}", crypto.quote.First().Value.volume_24h)</td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>
+<style>
+    .star:hover {
+        color: yellow;
+        cursor: pointer;
+    }
+
+    .active_star {
+        color: yellow;
+        font-weight: 800;
+    }
+    /* Style for price increase */
+    /* Style for price increase */
+    .price-up {
+        color: green; /* Change text color for price increase */
+        transition: color 3s ease-in-out;
+        font-weight: 500;
+    }
+
+    /* Style for price decrease */
+    .price-down {
+        color: red; /* Change text color for price decrease */
+        transition: color 3s ease-in-out;
+        font-weight: 500;
+    }
+
+</style>
+<script type="text/javascript">
+
+    // Об'єкт для зберігання параметрів
+    var queryParams = {};
+    var selectedSign = "$";
+
+    function updateTablePeriodically() {
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            url: "/Currency/GetFilteredResult?queryParams=" + JSON.stringify(queryParams),
+            success: function (data) {
+                cryptoTableBody.innerHTML = "";
+                updateTable(data, selectedSign);
+            },
+            error: function () {
+                alert("Помилка при завантаженні даних.");
+            }
+        });
+    }
+    // updateTablePeriodically();
+
+    // // Set an interval to call the function
+    // setInterval(updateTablePeriodically, 30000);
+
+    var addToFavouriteBtn = document.querySelectorAll("#addtofavouritebtn");
+    var stateMap = {};
+    for (let i = 0; i < addToFavouriteBtn.length; i++) {
+        var btn = addToFavouriteBtn[i];
+        btn.addEventListener("click", function () {
+            var isLiked = this.classList.contains("active_star");
+            var productID = this.getAttribute("data-id"); // Отримуємо productID для поточного елемента
+            var isUserLogin = this.getAttribute("data-islogin");
+
+            if (!isUserLogin || isUserLogin === 'null') {
+                return;
+            } else {
+                stateMap[productID] = isLiked;
+                var currentBtn = this; // Зберігаємо поточний елемент
+
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    url: "/Users/ManageFavourite?id=" + productID + "&addToFavourite=" + !isLiked,
+                    success: function (data) {
+                        if (!isLiked) {
+                            currentBtn.textContent = "★";
+                            currentBtn.classList.add("active_star");
+                        } else {
+                            currentBtn.textContent = "☆";
+                            currentBtn.classList.remove("active_star");
+                        }
+                        stateMap[productID] = !isLiked;
+                    },
+                    error: function () {
+                        alert("Помилка при завантаженні даних.");
+                    }
+                });
+            }
+        });
+    }
+
+    function updateTable(data, selectedFiatSign) {
+        // Очищаємо поточну таблицю
+        $("#cryptoTable tbody").empty();
+
+        // Перебираємо нові дані і заповнюємо таблицю
+        $.each(data.data, function (index, crypto) {
+            var quote = Object.values(crypto.quote)[0];
+            var row = '<tr data-id="' + crypto.id + '">'
+                + '<td class="fixed-column"><span class="star" id="addtofavouritebtn" data-id="' + crypto.id + '">☆</span></td>'
+                + '<td class="fixed-column">' + crypto.cmc_rank + '</td>'
+                + '<td class="fixed-column name_td_wrap">'
+                + '   <img class="currLogo" src="' + crypto.urlLogo + '" />'
+                + '   <div class="name_td">'
+                + '       <a class="name_td_text" href="/Currency/CryptoCurrencyDetails/?CurrencyID=' + crypto.id + '">' + crypto.name + '</a>'
+                + '       <a style="margin-left:5%;color:grey;" href="/Currency/CryptoCurrencyDetails/?CurrencyID=' + crypto.id + '">' + crypto.symbol + '</a>'
+                + '   </div>'
+                + '</td>'
+                + '<td>' + formatCurrency(quote.price, selectedFiatSign, 6) + '</td>'
+                + '<td class="' + getChangeClass(quote.percent_change_1h) + '">' + quote.percent_change_1h.toFixed(2) + '%</td>'
+                + '<td class="' + getChangeClass(quote.percent_change_24h) + '">' + quote.percent_change_24h.toFixed(2) + '%</td>'
+                + '<td class="' + getChangeClass(quote.percent_change_7d) + '">' + quote.percent_change_7d.toFixed(2) + '%</td>'
+                + '<td style=" color: blue;">' + formatCurrency(quote.market_cap, selectedFiatSign) + '</td>'
+                + '<td>' + formatNumber(crypto.circulating_supply) + ' ' + crypto.symbol + '</td>'
+                + '<td>' + formatCurrency(quote.volume_24h, selectedFiatSign) + '</td>'
+                + '</tr>';
+
+            var newRow = $(row); // Convert the row string to a jQuery element
+            $("#cryptoTable tbody").append(newRow);
+
+            var currentPrice = quote.price;
+            var previousPrice = parseFloat(newRow.find("td").eq(3).text().replace(/[^\d.-]/g, ''));
+            var priceCell = newRow.find("td").eq(3); // Select the cell containing the price
+
+            if (currentPrice > previousPrice) {
+                priceCell.addClass("price-up");
+            } else if (currentPrice < previousPrice) {
+                priceCell.addClass("price-down");
+            }
+
+            // Remove the color classes after a few seconds
+            setTimeout(function () {
+                priceCell.removeClass("price-up price-down");
+            }, 3000); // Change the color back after 3 seconds (adjust as needed)
+        });
+    }
+   
+    // Допоміжні функції для форматування та визначення класу для зміни
+    function formatCurrency(value, symbol, decimals = 0) {
+        return value.toFixed(decimals).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ' + symbol;
+    }
+
+    function formatNumber(value) {
+        return value.toFixed(0).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+
+    function getChangeClass(value) {
+        if (value > 0) return 'positive';
+        if (value < 0) return 'negative';
+        return 'neutral';
+    }
+</script>
+
+

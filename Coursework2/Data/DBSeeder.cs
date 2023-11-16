@@ -1,4 +1,5 @@
-﻿using Coursework2.Models.Constants;
+﻿using Coursework2.Areas.Identity.Data;
+using Coursework2.Models.Constants;
 using Microsoft.AspNetCore.Identity;
 
 namespace Coursework2.Data
@@ -7,7 +8,7 @@ namespace Coursework2.Data
     {
         public static async Task SeedDefaultData(IServiceProvider service)
         {
-            var userMgr = service.GetService<UserManager<IdentityUser>>();
+            var userMgr = service.GetService<UserManager<ApplicationUser>>();
             var roleMgr = service.GetService<RoleManager<IdentityRole>>();
             //adding some roles to db
             await roleMgr.CreateAsync(new IdentityRole(Roles.Admin.ToString()));
@@ -15,7 +16,7 @@ namespace Coursework2.Data
 
             // create admin user
 
-            var admin = new IdentityUser
+            var admin = new ApplicationUser
             {
                 UserName = "admin@gmail.com",
                 Email = "admin@gmail.com",
@@ -28,9 +29,6 @@ namespace Coursework2.Data
                 await userMgr.CreateAsync(admin, "Admin@123");
                 await userMgr.AddToRoleAsync(admin, Roles.Admin.ToString());
             }
-
-
-
         }
     }
 }

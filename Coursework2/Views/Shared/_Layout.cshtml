@@ -39,8 +39,8 @@
     <link rel="stylesheet" href="~/Coursework2.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="align-content-center justify-content-center" style="max-height: 1.5em; overflow: hidden;">
-        <div class="container-fluid  crypto-button-container">
+    <div class="marquee-container">
+        <div class="container-fluid crypto-button-container marquee">
             <ul class="d-flex flex-grow-1">
                 <li class="d-flex globaldata">
                     <p style="white-space: nowrap;">Cryptos:</p>
@@ -52,22 +52,35 @@
                 </li>
                 <li class="d-flex globaldata">
                     <p style="white-space: nowrap;">Market Cap:</p>
-                    <p class="globaldatatext">@FormatNumber(@data.Data.Quote.First().Value.total_market_cap)</p> <p class="@((@data.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change > 0) ? "positive" : (@data.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change < 0) ? "negative" : "neutral")"> @data.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change.ToString("N2")%</p>
+                    <p class="globaldatatext">@FormatNumber(@data.Data.Quote.First().Value.total_market_cap)</p>
+                    <p class="@((@data.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change > 0) ? "positive" : (@data.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change < 0) ? "negative" : "neutral")">
+                        @data.Data.Quote.First().Value.total_market_cap_yesterday_percentage_change.ToString("N2")%
+                    </p>
                 </li>
                 <li class="d-flex globaldata">
                     <p style="white-space: nowrap;">24h Volume:</p>
-                    <p class="globaldatatext">@FormatNumber(@data.Data.Quote.First().Value.total_volume_24h)</p> <p class="@((@data.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change > 0) ? "positive" : (@data.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change < 0) ? "negative" : "neutral")"> @data.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change.ToString("N2")%</p>
+                    <p class="globaldatatext">@FormatNumber(@data.Data.Quote.First().Value.total_volume_24h)</p>
+                    <p class="@((@data.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change > 0) ? "positive" : (@data.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change < 0) ? "negative" : "neutral")">
+                        @data.Data.Quote.First().Value.total_volume_24h_yesterday_percentage_change.ToString("N2")%
+                    </p>
                 </li>
                 <li class="d-flex globaldata">
                     <p style="white-space: nowrap;">Dominance:</p>
-                    <p class="globaldatatext">BTC:@data.Data.btc_dominance.ToString("N2")%</p> <p class="@((@data.Data.btc_dominance_24h_percentage_change > 0) ? "positive" : (@data.Data.btc_dominance_24h_percentage_change < 0) ? "negative" : "neutral")"> @data.Data.btc_dominance_24h_percentage_change.ToString("N2")%</p>
+                    <p class="globaldatatext">BTC:@data.Data.btc_dominance.ToString("N2")%</p>
+                    <p class="@((@data.Data.btc_dominance_24h_percentage_change > 0) ? "positive" : (@data.Data.btc_dominance_24h_percentage_change < 0) ? "negative" : "neutral")">
+                        @data.Data.btc_dominance_24h_percentage_change.ToString("N2")%
+                    </p>
                 </li>
                 <li class="d-flex globaldata">
-                    <p class="globaldatatext">ETH:@data.Data.eth_dominance.ToString("N2")%</p> <p class="@((@data.Data.eth_dominance_24h_percentage_change > 0) ? "positive" : (@data.Data.eth_dominance_24h_percentage_change < 0) ? "negative" : "neutral")"> @data.Data.eth_dominance_24h_percentage_change.ToString("N2")%</p>
+                    <p class="globaldatatext">ETH:@data.Data.eth_dominance.ToString("N2")%</p>
+                    <p class="@((@data.Data.eth_dominance_24h_percentage_change > 0) ? "positive" : (@data.Data.eth_dominance_24h_percentage_change < 0) ? "negative" : "neutral")">
+                        @data.Data.eth_dominance_24h_percentage_change.ToString("N2")%
+                    </p>
                 </li>
             </ul>
         </div>
     </div>
+
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">

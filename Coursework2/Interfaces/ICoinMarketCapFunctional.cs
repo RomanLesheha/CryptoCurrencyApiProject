@@ -1,4 +1,5 @@
 ﻿using Coursework2.Models;
+using Coursework2.Models.CoinMarketCapApiModels;
 
 namespace Coursework2.Interfaces
 {

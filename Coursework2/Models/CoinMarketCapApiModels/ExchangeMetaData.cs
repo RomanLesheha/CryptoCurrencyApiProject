@@ -1,4 +1,4 @@
-﻿namespace Coursework2.Models
+﻿namespace Coursework2.Models.CoinMarketCapApiModels
 {
     public class ExchangeMetaData
     {
@@ -14,20 +14,20 @@
         public string logo { get; set; }
         public List<object> countries { get; set; }
         public List<string> fiats { get; set; }
-        public List<ExchangeTags> ?tags { get; set; }
+        public List<ExchangeTags>? tags { get; set; }
         public string type { get; set; }
-        public double ?maker_fee { get; set; }
-        public double ?taker_fee { get; set; }
-        public long ?weekly_visits { get; set; }
-        public double ?spot_volume_usd { get; set; }
-        public DateTime ?spot_volume_last_updated { get; set; }
+        public double? maker_fee { get; set; }
+        public double? taker_fee { get; set; }
+        public long? weekly_visits { get; set; }
+        public double? spot_volume_usd { get; set; }
+        public DateTime? spot_volume_last_updated { get; set; }
         public ExchangeUrls urls { get; set; }
         public string date_launched { get; set; }
-        public int ?is_hidden { get; set; }
-        public int ?is_redistributable { get; set; }
-        public int ?porStatus { get; set; }
-        public int ?porAuditStatus { get; set; }
-        public int ?walletSourceStatus { get; set; }
+        public int? is_hidden { get; set; }
+        public int? is_redistributable { get; set; }
+        public int? porStatus { get; set; }
+        public int? porAuditStatus { get; set; }
+        public int? walletSourceStatus { get; set; }
         public string porSwitch { get; set; }
     }
 

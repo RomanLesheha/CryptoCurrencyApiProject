@@ -1,6 +1,7 @@
 ﻿@model CryptoCurrencyCategoryMetaData 
 @using Coursework2.Interfaces;
 @using System.Globalization;
+@using Coursework2.Models.CoinMarketCapApiModels;
 @{
     CultureInfo cultureInfo = new CultureInfo("en-US");
 }
@@ -27,7 +28,6 @@
                 <!-- Заголовок таблиці -->
                 <thead>
                     <tr>
-                        <th class="fixed-column"></th>
                         <th class="fixed-column">Rank</th>
                         <th class="fixed-column">Name</th>
                         <th>Price</th>
@@ -45,11 +45,13 @@
                     @foreach (var crypto in Model.data.coins)
                     {
                         <tr data-id="@crypto.id" class="table-row">
-                            <td class="fixed-column"><span class="star" id="addtofavouritebtn" data-id="@crypto.id">☆</span></td>
                             <td class="fixed-column">@crypto.cmc_rank</td>
-                            <td class="fixed-column">
-                                <img style="max-height:20px;max-width:20px;" src="@crypto.urlLogo" />
-                                <a asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.name  @crypto.symbol</a>
+                            <td class="fixed-column name_td_wrap">
+                                <img class="currLogo" src="@crypto.urlLogo" />
+                                <div class="name_td">
+                                    <a class="name_td_text" asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.name </a>
+                                    <a style="margin-left:5%;color:grey;" asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.symbol </a>
+                                </div>
                             </td>
                             <td>@crypto.quote.First().Value.price.ToString("N6")$</td>
                             <td class="@((crypto.quote.First().Value.percent_change_1h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_1h < 0) ? "negative" : "neutral")">

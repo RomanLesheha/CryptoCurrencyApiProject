@@ -1,36 +1,188 @@
-﻿@model CryptoCurrencyMetaData
+﻿@model CombinedData
+@using Coursework2.Models.CoinMarketCapApiModels;
+@using Coursework2.Interfaces;
+@using System.Globalization;
+@inject IUserRealization _user;
+@{
+    CultureInfo cultureInfo = new CultureInfo("en-US");
+}
+<div class="container">
+    <div class="container_wrap">
+        <div class="currency-charts">
+            <select id="history" class="form-control">
+                <option value="" disabled selected>Select Currency History Interval</option>
+                <option value="m1">1 minute</option>
+                <option value="m15">15 minute</option>
+                <option value="m30">30 minute</option>
+                <option value="h1">1 hour</option>
+                <option value="h6">6 hour</option>
+                <option value="h12">12 hour</option>
+                <option value="d1">1 day</option>
+            </select>
+            <canvas id="myChart" style="max-height: fit-content; width:600px;"></canvas>
+            <canvas id="myChart2" style="max-height: fit-content; width:600px;"></canvas>
+       
 
+        </div>
+        <div class="currency-detail">
+            <p style="display:none" id="id">@Model.Data.slug</p>
+            <div class="d-flex  align-items-start">
+                <img style="max-width:30px; max-height:30px;" src="@Model.MetaData.Data.First().Value.Logo" />
+                <p style="font-size:20px;font-weight:600;">@Model.MetaData.Data.First().Value.Name</>
+                <p style="color:grey;margin-left:2%; font-size:20px;font-weight:600;">@Model.MetaData.Data.First().Value.Symbol</p>
+            </div>
+            <div class="currency-detail-text">
+                <p class="description_text">Market Cap</p>
+                <p class="result_text">@string.Format(cultureInfo,"{0:C0}",Model.Data.quote.First().Value.market_cap)</p>
 
-<div class="container d-flex">
-    <div class="currency-detail">
-        <p style="display:none" id="id">@Model.Data.First().Value.Slug</p>
-
-    </div>
-    <div class="currency-charts">
-        <select id="history" class="form-control">
-            <option value="" disabled selected>Select Currency History Interval</option>
-            <option value="m1">1 minute</option>
-            <option value="m15">15 minute</option>
-            <option value="m30">30 minute</option>
-            <option value="h1">1 hour</option>
-            <option value="h6">6 hour</option>
-            <option value="h12">12 hour</option>
-            <option value="d1">1 day</option>
-        </select>
-        <canvas id="myChart" style="max-height: fit-content; max-width: fit-content;"></canvas>
+            </div>
+            <div class="currency-detail-text">
+                <p class="description_text">Volume</p>
+                <div class="d-flex">
+                    <p class="@((Model.Data.quote.First().Value.volume_change_24h > 0) ? "positive" : (Model.Data.quote.First().Value.volume_change_24h < 0) ? "negative" : "neutral")">
+                        @Model.Data.quote.First().Value.volume_change_24h.ToString("N2")%
+                    </p>
+                    <p class="result_text">@string.Format("${0:#,0}", Model.Data.quote.First().Value.volume_24h)</p>
+                </div>
+            </div>
+            <div class="currency-detail-text">
+                <p class="description_text">Circulating supply</p>
+                <p class="result_text">@string.Format("${0:#,0}", Model.Data.circulating_supply) @Model.Data.symbol</p>
+            </div>
+            <div class="currency-detail-text">
+                <p class="description_text">Total supply</p>
+                <p class="result_text">@string.Format("${0:#,0}", Model.Data.total_supply) @Model.Data.symbol</p>
+            </div>
+            <div class="currency-detail-text">
+                <p class="description_text">Max.supply</p>
+                @if (Model.Data.max_supply != null)
+                {
+                    <p class="result_text">@string.Format("${0:#,0}", Model.Data.max_supply) @Model.Data.symbol</p>
+                }else{
+                    <p class="result_text">∞</p>
+                }
+                
+            </div>
+            <div class="currency-detail-text">
+                <p class="description_text">Fully diluted market cap</p>
+                <p class="result_text">@string.Format("${0:#,0}", Model.Data.quote.First().Value.fully_diluted_market_cap)</p>
+            </div>
+            <div class="d-block">
+                <p style="font-weight:600">Official links</p>
+                <div class="d-flex">
+                    @if (!string.IsNullOrWhiteSpace(Model.MetaData.Data.First().Value.Urls.website.FirstOrDefault()))
+                    {
+                        <div class="wrap">
+                            <a href="@Model.MetaData.Data.First().Value.Urls.website.First()">🌐WEBSITE</a>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.MetaData.Data.First().Value.Urls.technical_doc.FirstOrDefault()))
+                    {
+                        <div class="wrap">
+                            <a href="@Model.MetaData.Data.First().Value.Urls.technical_doc.First()">📁Whitepaper</a>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.MetaData.Data.First().Value.Urls.source_code.FirstOrDefault()))
+                    {
+                        <div class="wrap">
+                            <a href="@Model.MetaData.Data.First().Value.Urls.source_code.First()">GitHub</a>
+                        </div>
+                    }
+                </div>
+                <p style="font-weight:600">Socials</p>
+                <div class="d-flex">
+                    @if (!string.IsNullOrWhiteSpace(Model.MetaData.Data.First().Value.Urls.reddit.FirstOrDefault()))
+                    {
+                        <div class="wrap">
+                            <a href="@Model.MetaData.Data.First().Value.Urls.reddit.First()">Reddit</a>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.MetaData.Data.First().Value.Urls.twitter.FirstOrDefault()))
+                    {
+                        <div class="wrap">
+                            <a href="@Model.MetaData.Data.First().Value.Urls.twitter.First()">Twitter</a>
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.MetaData.Data.First().Value.Urls.chat.FirstOrDefault()))
+                    {
+                        <div class="wrap">
+                            <a href="@Model.MetaData.Data.First().Value.Urls.chat.First()">Chat</a>
+                        </div>
+                    }
+                </div>
+                <p style="font-weight:600">Network information</p>
+                <div class="d-flex">
+                    @if (Model.MetaData.Data.First().Value.Urls.explorer.Any())
+                    {
+                        <div class="wrap">
+                            @if (Model.MetaData.Data.First().Value.Urls.explorer.Count() > 1)
+                            {
+                                <div class="dropdown" id="currenciesDropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Chain explorers</a>
+                                    <div class="dropdown-menu">
+                                        @foreach (var url in Model.MetaData.Data.First().Value.Urls.explorer)
+                                        {
+                                            <a class="dropdown-item" href="@url" target="_blank">@url</a>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <a href="@Model.MetaData.Data.First().Value.Urls.explorer.First()">Chain explorer</a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 
+
 <style>
-    .currency-detail{
-        display:block;
-        width:40%
+    .currency-detail {
+        width:40%;
     }
 
-    .currency-charts{
-        display: block;
-        width: 60%
+    .currency-charts {
+        width:55%;
+    }
+    .currency-detail-text{
+        display:flex;
+        justify-content:space-between;
+    }
+
+    .container_wrap {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap:5%;
+    }
+
+    .description_text{
+        color: grey;
+    }
+    .result_text{
+        font-weight:600;
+    }
+
+    .wrap{
+        width:fit-content;
+        height:30px;
+        border-radius:10px;
+        background-color: #EEF2F5;
+        vertical-align:central;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        padding:14px;
+        margin-left:4%;
+    }
+    .wrap a{
+        text-decoration:none;
+        color:black;
     }
 </style>
 
@@ -39,10 +191,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.1.0/chartjs-plugin-zoom.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.0.1/chartjs-plugin-annotation.js"></script>
 
+<script>
+    // Get the "Currencies" link and its dropdown menu
+    var currenciesLink = document.getElementById("currenciesDropdown");
+    var currenciesDropdownMenu = currenciesLink.querySelector(".dropdown-menu");
+
+    // Add a hover event listener to the "Currencies" link
+    currenciesLink.addEventListener("mouseenter", function () {
+        currenciesDropdownMenu.style.display = "block";
+    });
+
+    // Add a mouseleave event listener to hide the dropdown when the mouse leaves
+    currenciesLink.addEventListener("mouseleave", function () {
+        currenciesDropdownMenu.style.display = "none";
+    });
+</script>
 
 <script type="text/javascript">
     var currencyid = document.getElementById("id").innerText;
     var myChart;
+    var myChart2;
 
     document.getElementById("history").addEventListener("change", function () {
         var SelectedHistory = this.value;
@@ -51,6 +219,7 @@
     });
     $(document).ready(function () {
         AjaxRequest(currencyid);
+        loadChartDataMarkets();
     });
     function AjaxRequest(currencyid, SelectedHistory = "d1") {
         $.ajax({
@@ -72,13 +241,7 @@
         var _chartLabels = _data[0];
         var _chartData = _data[1];
         var color = ["#B738FF", "#CF9BE7", "#673A7C", "#B92CCF", "#590566"];
-        // Обчислюємо середнє значення
-        var averageValue = _chartData.reduce((a, b) => a + b, 0) / _chartData.length;
 
-        // Отримуємо колір для значення на основі порівняння з середнім
-        var color = _chartData.map(function (value) {
-            return value > averageValue ? 'green' : 'red';
-        });
         var existingChart = myChart;
 
         if (existingChart) {
@@ -86,28 +249,113 @@
         }
 
         myChart = new Chart("myChart", {
+            responsive: true,
             type: "line",
             data: {
                 labels: _chartLabels,
                 datasets: [{
                     label: "Prices",
                     data: _chartData,
-                    pointBackgroundColor: color,
-                    pointRadius: 1, // Відображення точок за замовчуванням вимкнено
-                    pointHoverRadius: 5, // Розмір точок при наведенні
+                    backgroundColor: color,
                 }]
             },
             options: {
                 scales: {
-                    x: {
-                        display: false,  // Вимкнути відображення осі X
-                    },
-                    y: {
-
-                    },
+                    xAxes: [{
+                        type: 'linear', // тип осі Х (лінійна для числових значень)
+                        position: 'bottom', // позиція осі Х
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'X-axis' // підпис для осі Х
+                        },
+                        pan: {
+                            enabled: true, // дозвіл переміщення за допомогою миші по осі Х
+                            mode: 'x', // режим переміщення по осі Х
+                        },
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Y-axis' // підпис для осі Y
+                        },
+                        pan: {
+                            enabled: true, // дозвіл переміщення за допомогою миші по осі Y
+                            mode: 'y', // режим переміщення по осі Y
+                        },
+                    }]
+                },
+                plugins: {
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'xy',
+                            threshold: 5,
+                        },
+                        zoom: {
+                            wheel: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'xy',
+                        },
+                    }
                 },
             },
 
         });
+    }
+
+    function loadChartDataMarkets() {
+        $.ajax({
+            type: "POST",
+            url: "/Currency/GetDataMarkets?CurrencyName=" + currencyid,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                var _data = data;
+                var _chartLabels = _data[0];
+                var _chartData = _data[1];
+                console.log(_data);
+                var color = ["#B738FF", "#CF9BE7", "#673A7C", "#B92CCF", "#590566"];
+
+                var existingChart = myChart2;
+
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+
+                myChart2 = new Chart("myChart2", {
+                    type: "radar",
+                    data: {
+                        labels: _chartLabels,
+                        datasets: [{
+                            label: "Markets",
+                            data: _chartData,
+                            backgroundColor: color,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Prices on different markets'
+                            }
+                        }
+                    },
+
+                });
+
+            },
+            error: function () {
+                alert("Помилка при завантаженні даних.");
+            }
+        });
+        
     }
 </script>

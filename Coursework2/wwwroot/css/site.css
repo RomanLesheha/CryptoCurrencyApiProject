@@ -16,6 +16,37 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    height:20px;
+}
+
+.marquee {
+    white-space: nowrap;
+    animation: marquee 30s linear infinite; /* You can adjust the animation duration */
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.crypto-button-container {
+    display: flex;
+}
+
+.globaldata {
+    margin-right: 20px; /* Adjust the spacing between items */
+}
+
+
 /* Стилі для модального вікна */
 .modal {
     display: none;
@@ -40,10 +71,12 @@ body {
 }
 
 .close {
-    float: right;
+    right:0;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    position:absolute;
+    margin-right:5px;
 }
 
     .close:hover {
@@ -51,14 +84,17 @@ body {
     }
 
 .group-label {
-    font-weight: bold;
+    font-size: 25px;
+    letter-spacing: 2px;
+    word-spacing: 0.2px;
+    color: #000000;
+    font-weight: 700;
+    text-decoration: none;
+    font-style: normal;
+    font-variant: small-caps;
+    text-transform: uppercase;
 }
 
-.group-divider {
-    border: 0;
-    border-top: 1px solid #ccc;
-    margin: 10px 0;
-}
 
 .filter-group {
     display: flex;
@@ -143,15 +179,18 @@ button#applyFilter {
     text-align: center;
     margin: 10px;
     padding: 10px;
-    border: 1px solid #ccc;
     border-radius: 5px;
 }
+    .currency-item:hover {
+        background-color: #EEF2F5;
+        transition: background-color ease-in-out 1s;
+    }
 
-.currency-image {
-    max-width: 40px;
-    max-height: 40px;
-    margin-right: 5px;
-}
+    .currency-image {
+        max-width: 40px;
+        max-height: 40px;
+        margin-right: 5px;
+    }
 
 .currency-name {
     font-size: 14px;
@@ -211,8 +250,14 @@ td a{
     align-items: center;
     justify-content: start;
 }
+.name_td_text {
+    color: black;
+    text-decoration: none;
+    font-weight: 600;
+}
 .positive {
     color: green; /* Колір для додатніх значень */
+    white-space: nowrap;
 }
     .positive::before {
         content: "▲";
@@ -222,6 +267,7 @@ td a{
 
 .negative {
     color: red; /* Колір для від'ємних значень */
+    white-space: nowrap;
 }
 
     .negative::before {
@@ -232,6 +278,7 @@ td a{
 
 .neutral {
     color: blue; /* Колір для нейтральних значень */
+    white-space: nowrap;
 }
 
 .crypto-button-container {
@@ -256,7 +303,7 @@ td a{
     }
 
     .crypto-button:hover {
-        background-color: rgb(245, 245, 245); /* Change the background color when hovering */
+        background-color: #f5f5f5;
         box-shadow: 48px 5px 58px -21px rgba(0,0,0,0.66);
         -webkit-box-shadow: 48px 5px 58px -21px rgba(0,0,0,0.66);
         -moz-box-shadow: 48px 5px 58px -21px rgba(0,0,0,0.66);
@@ -294,14 +341,20 @@ td a{
     .modal-content {
         width: 90%;
     }
-    .name_td{
-        display:grid;
+    .name_td {
+        display: grid;
+        font-size: 12px; /* Зменшуємо розмір шрифту для відображення більше тексту на екрані. */
+
+    }
+    .name_td_text {
+        margin-right: 2%;
+        white-space: pre-wrap;
+        text-overflow: ellipsis;
     }
     .currLogo {
-       max-width:35px;
-       max-height:35px;
+        max-width: 35px;
+        max-height: 35px;
     }
-    
 }
 
 
@@ -311,7 +364,6 @@ td a{
     justify-content: space-evenly;
     width: 100%;
     margin-top:5%;
-    margin-bottom:5%;
 }
 
 .crypto-table {
@@ -320,9 +372,9 @@ td a{
     padding: 15px;
     width: 40%;
     margin-bottom: 5%;
-    box-shadow: 9px 46px 94px -6px rgba(0,0,0,0.57);
-    -webkit-box-shadow: 9px 46px 94px -6px rgba(0,0,0,0.57);
-    -moz-box-shadow: 9px 46px 94px -6px rgba(0,0,0,0.57);
+    box-shadow: 33px -20px 73px -26px rgba(19,19,65,0.75);
+    -webkit-box-shadow: 33px -20px 73px -26px rgba(19,19,65,0.75);
+    -moz-box-shadow: 33px -20px 73px -26px rgba(19,19,65,0.75);
 }
 
 .name-column {
@@ -382,5 +434,26 @@ td a{
 
     .percent-change {
         display: none; /* Вмикнути поле 24h на медіа-запиті 992px та менше */
+    }
+}
+
+@media (max-width: 992px) {
+    .currency-charts {
+        flex-direction: column; /* Змінити на один стовпець на планшеті та телефоні */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #myChart,
+    #myChart2 {
+        max-height: 100vh;
+        max-width: 100%;
+        width: 100%;
+    }
+    .container_wrap {
+        flex-direction: column; /* Змінити на один стовпець на планшеті та телефоні */
+    }
+    .currency-detail {
+        width: 100%; /* Зміна ширини на 100% при телефонному режимі */
     }
 }

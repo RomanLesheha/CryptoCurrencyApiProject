@@ -1,53 +1,8 @@
 ﻿@model CryptoCurrenciesListMetaData
 @using Coursework2.Interfaces;
+@using Coursework2.Models.CoinMarketCapApiModels;
 @using System.Globalization;
 @inject ICoinMarketCapFunctional _service;
-
-@{
-    CultureInfo cultureInfo = new CultureInfo("en-US");
-    string formatstring(double price)
-    {
-        string formattedPrice;
-
-        if (price < 0.01)
-        {
-            formattedPrice = price.ToString("0.########"); // Закруглюємо до 9 знаків після коми
-        }
-        else
-        {
-            formattedPrice = price.ToString("0.00"); // Закруглюємо до 2 знаків після коми
-        }
-
-        string formattedPriceString = $"${formattedPrice:#,0.00}";
-        return formattedPriceString;
-    }
-    var data = await _service.GetGlobalMetricsAsync();
-    
-    string FormatNumber(double number)
-    {
-        if (number >= 1e12)
-        {
-            double trillions = number / 1e12;
-            return $"{trillions:F1}T+";
-        }
-        if (number >= 1e9)
-        {
-            double billions = number / 1e9;
-            return $"{billions:F1}B+";
-        }
-        if (number >= 1e6)
-        {
-            double millions = number / 1e6;
-            return $"{millions:F1}M+";
-        }
-        if (number >= 1e3)
-        {
-            double thousands = number / 1e3;
-            return $"{thousands:F1}K+";
-        }
-        return $"{number:F1}+";
-    }
-}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,31 +43,30 @@
                 <span class="close" data-modal="myModal">&times;</span>
                 <div class="image-list">
                     <p class="group-label">FIAT CURRENCY</p>
-                    <hr class="group-divider" />
                     <div class="currencies">
-                        <div class="currency-item">
-                            <img src="/Image/USD.png" data-value="USD" data-sign="$" class="currency-image" />
+                        <div class="currency-item" data-value="USD" data-sign="$">
+                            <img src="/Image/USD.png" class="currency-image" />
                             <div class="d-block">
                                 <p class="currency-name">United States Dollar</p>
                                 <p class="currency-sign">USD - $</p>
                             </div>
                         </div>
-                        <div class="currency-item">
-                            <img src="/Image/EUR.png" data-value="EUR" data-sign="€" class="currency-image" />
+                        <div class="currency-item" data-value="EUR" data-sign="€">
+                            <img src="/Image/EUR.png" class="currency-image" />
                             <div class="d-block">
                                 <p class="currency-name">Euro</p>
                                 <p class="currency-sign">EUR - €</p>
                             </div>
                         </div>
-                        <div class="currency-item">
-                            <img src="/Image/UAN.png" data-value="UAH" data-sign="₴" class="currency-image" />
+                        <div class="currency-item" data-value="UAH" data-sign="₴">
+                            <img src="/Image/UAN.png" class="currency-image" />
                             <div class="d-block">
                                 <p class="currency-name">Ukrainian Hryvnia</p>
                                 <p class="currency-sign">UAH - ₴</p>
                             </div>
                         </div>
-                        <div class="currency-item">
-                            <img src="/Image/BRL.png" data-value="BRL" data-sign="R$" class="currency-image" />
+                        <div class="currency-item" data-value="BRL" data-sign="R$">
+                            <img src="/Image/BRL.png" class="currency-image" />
                             <div class="d-block">
                                 <p class="currency-name">Brazilian Real</p>
                                 <p class="currency-sign">BRL - R$</p>
@@ -120,10 +74,9 @@
                         </div>
                     </div>
                     <p class="group-label">CRYPTO CURRENCY</p>
-                    <hr class="group-divider" />
                     <div class="currencies">
-                        <div class="currency-item">
-                            <img src="/Image/BTC.png" data-value="BTC" data-sign="BTC" class="currency-image" />
+                        <div class="currency-item" data-value="BTC" data-sign="BTC">
+                            <img src="/Image/BTC.png" class="currency-image" />
                             <div class="d-block">
                                 <p class="currency-name">Bitcoin</p>
                                 <p class="currency-sign">BTC</p>
@@ -154,6 +107,7 @@
                         <label for="tokens">Tokens</label>
                     </form>
                 </div>
+
                 <div class="filter-group">
                     <p>Market Cap Range</p>
                     <button class="toggle-button">&#9660</button>
@@ -166,6 +120,7 @@
                         <input type="number" name="marketCapRange" id="maxMarketCap" placeholder="Max" />
                     </div>
                 </div>
+
                 <div class="filter-group">
                     <p>Price</p>
                     <button class="toggle-button">&#9660</button>
@@ -178,67 +133,53 @@
                         <input type="number" name="price" id="maxprice" placeholder="Max" />
                     </div>
                 </div>
+
+                <div class="filter-group">
+                    <p>Volume 24h Range</p>
+                    <button class="toggle-button">&#9660</button>
+                </div>
+                <div class="filter-content">
+                    <p style="font-size:larger">Volume 24h Range</p>
+                    <div class="content-content">
+                        <input type="number" name="volume_24h" id="minvolume_24h" placeholder="Min" />
+                        <p>to</p>
+                        <input type="number" name="volume_24h" id="maxvolume_24h" placeholder="Max" />
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <p>Circulating Supply Range</p>
+                    <button class="toggle-button">&#9660</button>
+                </div>
+                <div class="filter-content">
+                    <p style="font-size:larger">Circulating Supply Range</p>
+                    <div class="content-content">
+                        <input type="number" name="circulating_supply" id="circulating_supply_min" placeholder="Min" />
+                        <p>to</p>
+                        <input type="number" name="circulating_supply" id="circulating_supply_max" placeholder="Max" />
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <p>Persent Change 24h</p>
+                    <button class="toggle-button">&#9660</button>
+                </div>
+                <div class="filter-content">
+                    <p style="font-size:larger">Persent Change 24h</p>
+                    <div class="content-content">
+                        <input type="number" name="percent_change" id="percent_change_24h_min" placeholder="Min" min="-100" />
+                        <p>to</p>
+                        <input type="number" name="percent_change" id="percent_change_24h_max" placeholder="Max" min="-100" />
+                    </div>
+                </div>
                 <button id="applyFilter">Apply Filter</button>
             </div>
         </div>
-
-
-        <div class="table-responsive">
-            <table id="cryptoTable" class="table custom-table">
-                <!-- Заголовок таблиці -->
-                <thead>
-                    <tr>
-                        <th class="fixed-column"></th>
-                        <th class="fixed-column">Rank</th>
-                        <th class="fixed-column">Name</th>
-                        <th>Price</th>
-                        <th>% 1h</th>
-                        <th>% 24h</th>
-                        <th>% 7d</th>
-                        <th>Market Cap</th>
-                        <th>Circulating Supply</th>
-                        <th>Volume(24h)</th>
-
-                    </tr>
-                </thead>
-                <!-- Тіло таблиці -->
-                <tbody id="cryptoTableBody">
-                    @foreach (var crypto in Model.data)
-                    {
-                        <tr data-id="@crypto.id" class="table-row">
-                            <td class="fixed-column"><span class="star" id="addtofavouritebtn" data-id="@crypto.id">☆</span></td>
-                            <td class="fixed-column">@crypto.cmc_rank</td>
-                            <td class="fixed-column name_td_wrap">
-                                <img class="currLogo" src="@crypto.urlLogo" />
-                                <div class="name_td">
-                                    <a style="margin-right:2%;" asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.name </a>
-                                    <a style="margin-right:2%;" asp-action="CryptoCurrencyDetails" asp-controller="Currency" asp-route-CurrencyID="@crypto.id">@crypto.symbol </a>
-                                </div>
-                                
-                            </td>
-                            <td>@crypto.quote.First().Value.price.ToString("N6")$</td>
-                            <td class="@((crypto.quote.First().Value.percent_change_1h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_1h < 0) ? "negative" : "neutral")">
-                                @crypto.quote.First().Value.percent_change_1h.ToString("N2")%
-                            </td>
-                            <td class="@((crypto.quote.First().Value.percent_change_24h > 0) ? "positive" : (crypto.quote.First().Value.percent_change_24h < 0) ? "negative" : "neutral")">
-                                @crypto.quote.First().Value.percent_change_24h.ToString("N2")%
-                            </td>
-                            <td class="@((crypto.quote.First().Value.percent_change_7d > 0) ? "positive" : (crypto.quote.First().Value.percent_change_7d < 0) ? "negative" : "neutral")">
-                                @crypto.quote.First().Value.percent_change_7d.ToString("N2")%
-                            </td>
-                            <td style=" color: blue;">@string.Format(cultureInfo, "{0:C0}", @crypto.quote.First().Value.market_cap)</td>
-                            <td>
-                                @string.Format("{0:#,0}",@Math.Round(crypto.circulating_supply)) @crypto.symbol <br>
-                            </td>
-                            <td>@string.Format("${0:#,0}", crypto.quote.First().Value.volume_24h)</td>
-
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <div>
+            <!-- Render the CryptoCurrenciesListMetaData partial view here -->
+            @Html.Partial("CryptoCurrenciesList", Model)
         </div>
     </div>
-
 </body>
 </html>
 <style>
@@ -275,13 +216,22 @@
     var modal = document.getElementById("myModal");
     var modal2 = document.getElementById("myModal2");
     var closeModalButtons = document.getElementsByClassName("close");
-    var currencyImages = document.querySelectorAll(".currency-image");
+    var currencyImages = document.querySelectorAll(".currency-item");
     
     var minMarketCapInput = document.getElementById("minMarketCap");
     var maxMarketCapInput = document.getElementById("maxMarketCap");
 
     var minPriceInput = document.getElementById("minprice");
     var maxPriceInput = document.getElementById("maxprice");
+
+    var minvolume_24hInput = document.getElementById("minvolume_24h");
+    var maxvolume_24hInput = document.getElementById("maxvolume_24h");
+
+    var circulating_supply_minInput = document.getElementById("circulating_supply_min");
+    var circulating_supply_maxInput = document.getElementById("circulating_supply_max");
+
+    var minpercent_changeInput = document.getElementById("percent_change_24h_min");
+    var maxpercent_changeInput = document.getElementById("percent_change_24h_max");
 
     var applyFilterButton = document.getElementById("applyFilter");
 
@@ -334,26 +284,6 @@
     var queryParams = {};
     var selectedSign = "$";
 
-    function updateTablePeriodically() {
-        $.ajax({
-            type: "POST",
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            url: "/Currency/GetFilteredResult?queryParams=" + JSON.stringify(queryParams),
-            success: function (data) {
-                cryptoTableBody.innerHTML = "";
-                updateTable(data, selectedSign);
-            },
-            error: function () {
-                alert("Помилка при завантаженні даних.");
-            }
-        });
-    }
-    // updateTablePeriodically();
-
-    // // Set an interval to call the function 
-    // setInterval(updateTablePeriodically, 30000);
-
     var radioButtons = document.querySelectorAll('input[name="cryptocurrency_type"]');
     for (var i = 0; i < radioButtons.length; i++) {
         radioButtons[i].addEventListener("change", function () {
@@ -373,9 +303,6 @@
         });
     }
 
-   
-
-    var currencyImages = document.querySelectorAll('.currency-image');
     currencyImages.forEach(function (image) {
         image.onclick = function () {
             var selectedValue = this.getAttribute("data-value");
@@ -422,8 +349,17 @@
         var minMarketCap = parseFloat(minMarketCapInput.value) || 0;
         var maxMarketCap = parseFloat(maxMarketCapInput.value) || Number.POSITIVE_INFINITY;
 
+        var volume_24h_min = parseFloat(minvolume_24hInput.value) || 0;
+        var volume_24h_max = parseFloat(maxvolume_24hInput.value) || Number.POSITIVE_INFINITY;
+
         var minPrice = parseFloat(minPriceInput.value) || 0;
         var maxPrice = parseFloat(maxPriceInput.value) || Number.POSITIVE_INFINITY;
+
+        var circulating_supply_min = parseFloat(circulating_supply_minInput.value) || 0;
+        var circulating_supply_max = parseFloat(circulating_supply_maxInput.value) || Number.POSITIVE_INFINITY;
+
+        var percent_change_24h_min = parseFloat(minpercent_changeInput.value) || -100;
+        var percent_change_24h_max = parseFloat(maxpercent_changeInput.value) || Number.POSITIVE_INFINITY;
 
         // Додавання параметрів до об'єкта queryParams
         if (queryParams.hasOwnProperty("price_min") && queryParams.hasOwnProperty("price_max")) {
@@ -446,6 +382,40 @@
             queryParams["market_cap_min"] = minMarketCap;
             queryParams["market_cap_max"] = maxMarketCap;
         }
+
+        // Додавання параметрів до об'єкта queryParams
+        if (queryParams.hasOwnProperty("volume_24h_min") && queryParams.hasOwnProperty("volume_24h_max")) {
+            // Якщо обидва параметри вже існують, оновлюємо їх значення
+            queryParams["volume_24h_min"] = volume_24h_min;
+            queryParams["volume_24h_max"] = volume_24h_max;
+        } else {
+            // Якщо хоча б один з параметрів не існує, додаємо обидва параметри
+            queryParams["volume_24h_min"] = volume_24h_min;
+            queryParams["volume_24h_max"] = volume_24h_max;
+        }
+
+        // Додавання параметрів до об'єкта queryParams
+        if (queryParams.hasOwnProperty("circulating_supply_min") && queryParams.hasOwnProperty("circulating_supply_max")) {
+            // Якщо обидва параметри вже існують, оновлюємо їх значення
+            queryParams["circulating_supply_min"] = circulating_supply_min;
+            queryParams["circulating_supply_max"] = circulating_supply_max;
+        } else {
+            // Якщо хоча б один з параметрів не існує, додаємо обидва параметри
+            queryParams["circulating_supply_min"] = circulating_supply_min;
+            queryParams["circulating_supply_max"] = circulating_supply_max;
+        }
+
+        // Додавання параметрів до об'єкта queryParams
+        if (queryParams.hasOwnProperty("percent_change_24h_min") && queryParams.hasOwnProperty("percent_change_24h_max")) {
+            // Якщо обидва параметри вже існують, оновлюємо їх значення
+            queryParams["percent_change_24h_min"] = percent_change_24h_min;
+            queryParams["percent_change_24h_max"] = percent_change_24h_max;
+        } else {
+            // Якщо хоча б один з параметрів не існує, додаємо обидва параметри
+            queryParams["percent_change_24h_min"] = percent_change_24h_min;
+            queryParams["percent_change_24h_max"] = percent_change_24h_max;
+        }
+
         console.log(queryParams);
         // Відправлення запиту з поточними параметрами
         sendAjaxRequest(selectedSign);
@@ -495,61 +465,6 @@
                 alert("Помилка при завантаженні даних.");
             }
         });
-    }
-
-    function updateTable(data, selectedFiatSign) {
-        // Очищаємо поточну таблицю
-        $("#cryptoTable tbody").empty();
-
-        // Перебираємо нові дані і заповнюємо таблицю
-        $.each(data.data, function (index, crypto) {
-            var quote = Object.values(crypto.quote)[0];
-            var row = '<tr data-id="' + crypto.id + '">'
-                + '<td class="fixed-column"><span class="star" id="addtofavouritebtn" data-id="' + crypto.id + '">☆</span></td>'
-                + '<td class="fixed-column">' + crypto.cmc_rank + '</td>'
-                + '<td class="fixed-column"><img style="max-height:20px;max-width:20px;" src="' + crypto.urlLogo + '"/> <a href="/Currency/CryptoCurrencyDetails/?CurrencyID=' + crypto.id + '">' + crypto.name + ' ' + crypto.symbol + '</a></td>'
-                + '<td>' + formatCurrency(quote.price, selectedFiatSign, 6) + '</td>'
-                + '<td class="' + getChangeClass(quote.percent_change_1h) + '">' + quote.percent_change_1h.toFixed(2) + '%</td>'
-                + '<td class="' + getChangeClass(quote.percent_change_24h) + '">' + quote.percent_change_24h.toFixed(2) + '%</td>'
-                + '<td class="' + getChangeClass(quote.percent_change_7d) + '">' + quote.percent_change_7d.toFixed(2) + '%</td>'
-                + '<td style=" color: blue;">' + formatCurrency(quote.market_cap, selectedFiatSign) + '</td>'
-                + '<td>' + formatNumber(crypto.circulating_supply) + ' ' + crypto.symbol + '</td>'
-                + '<td>' + formatCurrency(quote.volume_24h, selectedFiatSign) + '</td>'
-                + '</tr>';
-
-            var newRow = $(row); // Convert the row string to a jQuery element
-            $("#cryptoTable tbody").append(newRow);
-
-            var currentPrice = quote.price;
-            var previousPrice = parseFloat(newRow.find("td").eq(3).text().replace(/[^\d.-]/g, ''));
-            var priceCell = newRow.find("td").eq(3); // Select the cell containing the price
-
-            if (currentPrice > previousPrice) {
-                priceCell.addClass("price-up");
-            } else if (currentPrice < previousPrice) {
-                priceCell.addClass("price-down");
-            }
-
-            // Remove the color classes after a few seconds
-            setTimeout(function () {
-                priceCell.removeClass("price-up price-down");
-            }, 3000); // Change the color back after 3 seconds (adjust as needed)
-        });
-    }
-
-    // Допоміжні функції для форматування та визначення класу для зміни
-    function formatCurrency(value, symbol, decimals = 0) {
-        return value.toFixed(decimals).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ' + symbol;
-    }
-
-    function formatNumber(value) {
-        return value.toFixed(0).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-    }
-
-    function getChangeClass(value) {
-        if (value > 0) return 'positive';
-        if (value < 0) return 'negative';
-        return 'neutral';
     }
 </script>
 
