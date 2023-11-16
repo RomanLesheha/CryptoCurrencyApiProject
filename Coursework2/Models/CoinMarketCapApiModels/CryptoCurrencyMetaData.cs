@@ -1,4 +1,4 @@
-﻿namespace Coursework2.Models
+﻿namespace Coursework2.Models.CoinMarketCapApiModels
 {
     public class CryptoCurrencyMetaData
     {
@@ -7,15 +7,15 @@
     }
     public class Urls
     {
-        public List<string> Website { get; set; }
-        public List<string> TechnicalDoc { get; set; }
-        public List<string> Twitter { get; set; }
-        public List<string> Reddit { get; set; }
-        public List<string> MessageBoard { get; set; }
-        public List<string> Announcement { get; set; }
-        public List<string> Chat { get; set; }
-        public List<string> Explorer { get; set; }
-        public List<string> SourceCode { get; set; }
+        public List<string> website { get; set; }
+        public List<string> technical_doc { get; set; }
+        public List<string> twitter { get; set; }
+        public List<string> reddit { get; set; }
+        public List<string> message_board { get; set; }
+        public List<string> announcement { get; set; }
+        public List<string> chat { get; set; }
+        public List<string> explorer { get; set; }
+        public List<string> source_code { get; set; }
     }
 
     public class DataItem
@@ -30,8 +30,11 @@
         public DateTime DateAdded { get; set; }
         public DateTime DateLaunched { get; set; }
         public List<string> Tags { get; set; }
+        public List<string> Tags_Name { get; set; }
+        public List<string> Tags_Groups { get; set; }
         public Platform Platform { get; set; }
         public string Category { get; set; }
         public object Notice { get; set; }
     }
 }
+

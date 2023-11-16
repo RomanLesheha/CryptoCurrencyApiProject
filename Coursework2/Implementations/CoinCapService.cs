@@ -37,40 +37,24 @@ namespace Coursework2.Realizations
             return _data;
         }
 
-        public async Task<List<object>> ParseTopCurrency(int currentIndex)
+        public async Task<List<object>> ParseCurrencyOnMarkets(string CurrencyName, int Count)
         {
-            var data = await _apiParser.GetApiParser(ApiServiceFactory.ApiParserType.CoinCap).ParseAsync<AssetsResponse>("/v2/assets");
-            var sortedData = data.data.OrderByDescending(item => item.priceUsd);
+            var data = await _apiParser.GetApiParser(ApiServiceFactory.ApiParserType.CoinCap).ParseAsync<Markets>($"/v2/assets/{CurrencyName}/markets");
+
+            var sortedData = data.data.Take(Count);
 
             List<object> _data = new List<object>();
-            int numberOfValues = 10;
-            // Calculate the start and end indices based on the number of values and the current index
-            int startIndex = currentIndex * numberOfValues;
-            int endIndex = Math.Min(startIndex + numberOfValues, data.data.Count);
 
-            List<string> labels = sortedData
-                .Skip(startIndex)
-                .Take(endIndex - startIndex)
-                .Select(p => p.name)
-                .ToList();
+            List<decimal> values = sortedData.Select(item => item.priceUsd).ToList();
 
-            List<decimal> Price = sortedData
-                .Skip(startIndex)
-                .Take(endIndex - startIndex)
-                .Select(p => p.priceUsd)
-                .ToList();
-
-            List<string> Id = sortedData
-                .Skip(startIndex)
-                .Take(endIndex - startIndex)
-                .Select(p => p.id)
-                .ToList();
+            List<string> labels = sortedData.Select(item => item.exchangeId).ToList();
 
             _data.Add(labels);
-            _data.Add(Price);
-            _data.Add(Id);
-
+            _data.Add(values);
             return _data;
+
+
+
         }
     }
 }

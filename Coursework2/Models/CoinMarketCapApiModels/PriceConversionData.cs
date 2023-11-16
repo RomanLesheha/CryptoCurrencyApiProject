@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic;
+﻿using Coursework2.Models;
+using Microsoft.VisualBasic;
 
 namespace Coursework2.Models
 {

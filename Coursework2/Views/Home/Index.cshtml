@@ -1,4 +1,6 @@
 ﻿@using Coursework2.Interfaces
+@using Coursework2.Models.CoinMarketCapApiModels
+@model CryptoCurrenciesListMetaData
 @inject ICoinMarketCapFunctional _service;
 @{
     ViewData["Title"] = "Home Page";
@@ -129,6 +131,11 @@
                 </div>
             </div>
         </div>
+        <div>
+            <!-- Render the CryptoCurrenciesListMetaData partial view here -->
+                @Html.Partial("CryptoCurrenciesList", Model)
+        </div>
+
     </div>
 </body>
 

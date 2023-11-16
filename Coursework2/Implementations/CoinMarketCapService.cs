@@ -2,6 +2,7 @@
 using Coursework2.Factories.Interfaces;
 using Coursework2.Interfaces;
 using Coursework2.Models;
+using Coursework2.Models.CoinMarketCapApiModels;
 using Microsoft.EntityFrameworkCore;
 using System.Web;
 using static System.Net.WebRequestMethods;
@@ -39,8 +40,6 @@ namespace Coursework2.Realizations
             {
                 return new CryptoCurrency();
             }
-           
-            return null;
         }
 
         public async Task<CryptoCurrencyMetaData> GetCoinMarketCapMetaDataAsync(int CurrencyID)

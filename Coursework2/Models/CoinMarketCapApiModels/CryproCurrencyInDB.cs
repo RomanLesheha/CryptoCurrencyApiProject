@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Coursework2.Models
+namespace Coursework2.Models.CoinMarketCapApiModels
 {
     public class CryproCurrencyInDB
     {

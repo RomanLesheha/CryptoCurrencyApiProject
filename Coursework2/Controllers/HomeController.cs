@@ -1,4 +1,5 @@
 ﻿
+using Coursework2.Areas.Identity.Data;
 using Coursework2.Interfaces;
 using Coursework2.Models;
 using Microsoft.AspNetCore.Http;
@@ -12,17 +13,36 @@ namespace Coursework2.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly UserManager<IdentityUser> _userManager;
-        public HomeController(ILogger<HomeController> logger , IHttpContextAccessor http , UserManager<IdentityUser> user )
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context;
+        private readonly ICoinMarketCapFunctional _marketCapFunctional;
+        public HomeController(ILogger<HomeController> logger , ICoinMarketCapFunctional marketCapFunctional, IHttpContextAccessor http , UserManager<ApplicationUser> user,  ApplicationDbContext context)
         {
             _logger = logger;
             _httpContextAccessor = http;
             _userManager = user;
+            _context = context;
+            _marketCapFunctional = marketCapFunctional;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
-            return View();
+            try
+            {
+                var result = await _marketCapFunctional.GetCryptoCurrenciesListMetaAsync(null);
+                return View(result);
+            }
+            catch (Exception ex)
+            {
+                var errorModel = new ErrorViewModel
+                {
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                    ErrorMessage = ex.Message,
+                    ExceptionDetails = ex.ToString(), // Деталі Exception
+                    StackTrace = ex.StackTrace
+                };
+                return View("Error", errorModel);
+            }
         }
 
         public IActionResult Privacy()

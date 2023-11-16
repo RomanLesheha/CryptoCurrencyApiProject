@@ -4,6 +4,7 @@ using Coursework2.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Coursework2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231102161012_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,25 +111,6 @@ namespace Coursework2.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("FavouriteCurrencies");
-                });
-
-            modelBuilder.Entity("Coursework2.Areas.Identity.Data.PopularCurrencies", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<int>("CurrencyID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumberOfVisits")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("PopularCurrencies");
                 });
 
             modelBuilder.Entity("Coursework2.Areas.Identity.Data.RecentlyVisitedCurrency", b =>

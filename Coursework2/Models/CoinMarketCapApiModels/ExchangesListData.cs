@@ -1,4 +1,6 @@
-﻿namespace Coursework2.Models
+﻿using Coursework2.Models;
+
+namespace Coursework2.Models
 {
     public class ExchangesListData
     {

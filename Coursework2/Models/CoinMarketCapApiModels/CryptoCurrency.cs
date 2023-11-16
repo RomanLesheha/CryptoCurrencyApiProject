@@ -1,4 +1,4 @@
-﻿namespace Coursework2.Models
+﻿namespace Coursework2.Models.CoinMarketCapApiModels
 {
     public class CryptoCurrency
     {
